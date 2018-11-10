@@ -87,6 +87,7 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
+  //Make the LED blink 
   HEARTBEAT_OFF();
   
   /* If good initialization, set state to Idle */
@@ -120,7 +121,9 @@ Promises:
 void UserApp1RunActiveState(void)
 {
   UserApp1_StateMachine();
-
+  
+  //Make the LED blink 
+  
 } /* end UserApp1RunActiveState */
 
 
@@ -138,10 +141,12 @@ State Machine Function Definitions
 static void UserApp1SM_Idle(void)
 {
   static u32 u32Counter = 0;
+  static u32 u32alternatingColoursCounter = 0;
   static bool bLightIsOn = FALSE;
   //Increment counter every millisecond
   u32Counter++;
   
+  /*
   if(u32Counter == COUNTER_LIMIT_MS)
   {
     //If COUNTER_LIMIT_MS milliseconds have passed reset the counter and switch the state of the LED.
@@ -155,6 +160,38 @@ static void UserApp1SM_Idle(void)
       HEARTBEAT_ON();
     }
     bLightIsOn = !bLightIsOn;
+  } 
+  */
+ 
+  u32alternatingColoursCounter++;
+  if(u32alternatingColoursCounter == ALTERNATING_COLOUR_LIMIT_MS)
+  {
+    //If 0.5 seconds have passed, turn on the leftmost LED
+    LedPWM(GREEN0, LED_PWM_35);
+  }
+  if(u32alternatingColoursCounter == 2*ALTERNATING_COLOUR_LIMIT_MS)
+  {
+    //If 1 second has passed, turn on the next LED
+    LedPWM(RED1, LED_PWM_35);
+  }
+  if(u32alternatingColoursCounter == 3*ALTERNATING_COLOUR_LIMIT_MS)
+  {
+    //If 1.5 seconds have passed, turn on the next LED
+    LedPWM(GREEN2, LED_PWM_35);
+  }
+  if(u32alternatingColoursCounter == 4*ALTERNATING_COLOUR_LIMIT_MS)
+  {
+    //If 2 seconds have passed, turn on the last LED
+    LedPWM(RED3, LED_PWM_35);
+  }
+  if(u32alternatingColoursCounter == 5*ALTERNATING_COLOUR_LIMIT_MS)
+  {
+    //If 2.5 seconds have passed, turn off all the LEDs
+    u32alternatingColoursCounter = 0;
+    LedOff(GREEN0);
+    LedOff(RED1);
+    LedOff(GREEN2);
+    LedOff(RED2);
   }
   
 } /* end UserApp1SM_Idle() */
