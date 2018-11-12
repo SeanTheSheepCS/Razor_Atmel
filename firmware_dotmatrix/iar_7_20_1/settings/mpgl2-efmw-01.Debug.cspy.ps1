@@ -23,9 +23,9 @@ param([String]$debugfile = "");
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\user\Desktop\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --backend -f "C:\Users\user\Desktop\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
+& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --backend -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
 }
 else
 {
-& "C:\Program Files\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\user\Desktop\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\user\Desktop\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
+& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
 }
