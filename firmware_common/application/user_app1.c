@@ -140,6 +140,7 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  //This is a test!
   static u32 u32Counter = 0;
   static u32 u32alternatingColoursCounter = 0;
   static bool bLightIsOn = FALSE;
