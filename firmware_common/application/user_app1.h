@@ -31,6 +31,14 @@ Constants / Definitions
 #define COUNTER_LIMIT_MS (u32)2500
 #define ALTERNATING_COLOUR_LIMIT_MS (u32)500
 
+#define E4FREQ_HZ (u32)330
+#define G4FREQ_HZ (u32)392
+#define C4FREQ_HZ (u32)262
+#define D4FREQ_HZ (u32)294
+#define F4FREQ_HZ (u32)349
+
+#define QUARTERNOTETIME_MS (u32)500
+
 /**********************************************************************************************************************
 Function Declarations
 **********************************************************************************************************************/
@@ -45,6 +53,8 @@ Function Declarations
 /*--------------------------------------------------------------------------------------------------------------------*/
 void UserApp1Initialize(void);
 void UserApp1RunActiveState(void);
+void FestiveLightsPatternOne(void);
+bool Jingle(bool reset);
 
 
 /*--------------------------------------------------------------------------------------------------------------------*/

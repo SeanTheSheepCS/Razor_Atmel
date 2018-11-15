@@ -89,7 +89,6 @@ void UserApp1Initialize(void)
 {
   //Make the LED blink 
   HEARTBEAT_OFF();
-  
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -140,33 +139,49 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  static u32 u32Counter = 0;
-  static u32 u32alternatingColoursCounter = 0;
-  static bool bLightIsOn = FALSE;
+  static bool shouldJingle = FALSE;
+  
+  FestiveLightsPatternOne();
+  
+  if(IsButtonPressed(BUTTON0))
+  {
+    shouldJingle = TRUE;
+  }
+  if(IsButtonPressed(BUTTON1))
+  {
+    shouldJingle = FALSE;
+  }
+  if(shouldJingle)
+  {
+    shouldJingle = Jingle(FALSE);
+  }
+  else
+  {
+    PWMAudioOff(BUZZER1);
+  }
+  
+  if(IsButtonHeld(BUTTON1,500))
+  {
+    Jingle(TRUE); //This resets the jingle timer.
+  }
+} /* end UserApp1SM_Idle() */
+    
+
+/*-------------------------------------------------------------------------------------------------------------------*/
+/* Handle an error */
+static void UserApp1SM_Error(void)          
+{
+  
+} /* end UserApp1SM_Error() */
+
+static void FestiveLightsPatternOne()
+{
+  //Increment counter every millisecond
   static bool hasReachedLED0 = FALSE;
   static bool hasReachedLED1 = FALSE;
   static bool hasReachedLED2 = FALSE;
   static bool hasReachedLED3 = FALSE;
-  //Increment counter every millisecond
-  u32Counter++;
-  
-  /*
-  if(u32Counter == COUNTER_LIMIT_MS)
-  {
-    //If COUNTER_LIMIT_MS milliseconds have passed reset the counter and switch the state of the LED.
-    u32Counter = 0;
-    if(bLightIsOn)
-    {
-      HEARTBEAT_OFF();
-    }
-    else
-    {
-      HEARTBEAT_ON();
-    }
-    bLightIsOn = !bLightIsOn;
-  } 
-  */
- 
+  static u32 u32alternatingColoursCounter = 0;
   u32alternatingColoursCounter++;
   if((u32alternatingColoursCounter > ALTERNATING_COLOUR_LIMIT_MS)&&(!hasReachedLED0))
   {
@@ -206,16 +221,127 @@ static void UserApp1SM_Idle(void)
     hasReachedLED3 = FALSE;
   }
   
-} /* end UserApp1SM_Idle() */
-    
+}
 
-/*-------------------------------------------------------------------------------------------------------------------*/
-/* Handle an error */
-static void UserApp1SM_Error(void)          
+static bool Jingle(bool reset)
 {
+  static u32 u32timePassed_MS = 0; //The number of millisecounds that the jingle has been played for
+  static u32 u32jingleQNotesPassed = 0; //The number of quarter notes that have been played in the jingle
+  static u32 u32noteTime_MS = 0;
   
-} /* end UserApp1SM_Error() */
-
+  if(reset)
+  {
+    u32timePassed_MS = 0;
+    return FALSE;
+  }
+  
+  u32jingleQNotesPassed = u32timePassed_MS / QUARTERNOTETIME_MS; //Sets QNotes passed based on the time passed
+  
+  //Choose what note to play based on the number of quarter notes that have passed.
+  
+  if(u32jingleQNotesPassed == 0)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 2)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS * 2;
+  }
+  else if(u32jingleQNotesPassed == 4)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 6)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS * 2;
+  }
+  else if(u32jingleQNotesPassed == 8)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 9)
+  {
+    PWMAudioSetFrequency(BUZZER1,G4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 10)
+  {
+    PWMAudioSetFrequency(BUZZER1,C4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 11)
+  {
+    PWMAudioSetFrequency(BUZZER1,D4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 12)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 13)
+  {
+    PWMAudioSetFrequency(BUZZER1,F4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS*4;
+  }
+  else if(u32jingleQNotesPassed == 17)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 19)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS / 2;
+  }
+  else if(u32jingleQNotesPassed == 21)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  /*
+  else if(u32jingleQNotesPassed > 4 && u32jingleQNotesPassed < 7)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 7)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS * 2;
+  }
+  */
+  //Buzzer should turn off for the last 100 ms. If the note lasts less than 100ms, then it should wait  1/5 of the length of the note.
+  u32 u32playTime = 0;
+  if(u32timePassed_MS < 100)
+  {
+    u32playTime = (4/5)*u32noteTime_MS;
+  }
+  else
+  {
+    u32playTime = u32noteTime_MS-100;
+  }
+  
+  
+  if(u32timePassed_MS % u32noteTime_MS < u32playTime)
+  {
+    PWMAudioOn(BUZZER1);
+  }
+  else
+  {
+    PWMAudioOff(BUZZER1);
+  }
+  
+  
+  u32timePassed_MS++;
+  
+  return TRUE;
+}
 
 
 /*--------------------------------------------------------------------------------------------------------------------*/
