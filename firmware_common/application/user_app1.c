@@ -282,43 +282,139 @@ static bool Jingle(bool reset)
   else if(u32jingleQNotesPassed == 12)
   {
     PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
-    u32noteTime_MS = QUARTERNOTETIME_MS;
-  }
-  else if(u32jingleQNotesPassed == 13)
-  {
-    PWMAudioSetFrequency(BUZZER1,F4FREQ_HZ);
     u32noteTime_MS = QUARTERNOTETIME_MS*4;
   }
-  else if(u32jingleQNotesPassed == 17)
+  else if(u32jingleQNotesPassed == 16)
   {
-    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    PWMAudioSetFrequency(BUZZER1,F4FREQ_HZ);
     u32noteTime_MS = QUARTERNOTETIME_MS;
-  }
-  else if(u32jingleQNotesPassed == 19)
-  {
-    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
-    u32noteTime_MS = QUARTERNOTETIME_MS / 2;
   }
   else if(u32jingleQNotesPassed == 21)
   {
     PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
     u32noteTime_MS = QUARTERNOTETIME_MS;
   }
-  /*
-  else if(u32jingleQNotesPassed > 4 && u32jingleQNotesPassed < 7)
+  else if(u32jingleQNotesPassed == 23)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS / 2;
+  }
+  else if(u32jingleQNotesPassed == 24)
   {
     PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
     u32noteTime_MS = QUARTERNOTETIME_MS;
   }
-  else if(u32jingleQNotesPassed == 7)
+  else if(u32jingleQNotesPassed == 26)
+  {
+    PWMAudioSetFrequency(BUZZER1,D4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 27)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 28)
+  {
+    PWMAudioSetFrequency(BUZZER1,D4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS*2;
+  }
+  else if(u32jingleQNotesPassed == 30)
+  {
+    PWMAudioSetFrequency(BUZZER1,G4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 31)
+  {
+    PWMAudioSetFrequency(BUZZER1,0);
+    u32noteTime_MS = 0;
+  }
+  //2ND LINE
+  if(u32jingleQNotesPassed == 32)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 34)
   {
     PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
     u32noteTime_MS = QUARTERNOTETIME_MS * 2;
   }
-  */
+  else if(u32jingleQNotesPassed == 36)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 38)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS * 2;
+  }
+  else if(u32jingleQNotesPassed == 40)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 41)
+  {
+    PWMAudioSetFrequency(BUZZER1,G4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 42)
+  {
+    PWMAudioSetFrequency(BUZZER1,C4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 43)
+  {
+    PWMAudioSetFrequency(BUZZER1,D4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 44)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS*4;
+  }
+  else if(u32jingleQNotesPassed == 48)
+  {
+    PWMAudioSetFrequency(BUZZER1,F4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 53)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 55)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS / 2;
+  }
+  else if(u32jingleQNotesPassed == 56)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 58)
+  {
+    PWMAudioSetFrequency(BUZZER1,D4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 59)
+  {
+    PWMAudioSetFrequency(BUZZER1,E4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS;
+  }
+  else if(u32jingleQNotesPassed == 60)
+  {
+    PWMAudioSetFrequency(BUZZER1,D4FREQ_HZ);
+    u32noteTime_MS = QUARTERNOTETIME_MS*4;
+  }
+  
+  
   //Buzzer should turn off for the last 100 ms. If the note lasts less than 100ms, then it should wait  1/5 of the length of the note.
   u32 u32playTime = 0;
-  if(u32timePassed_MS < 100)
+  if(u32noteTime_MS < 100)
   {
     u32playTime = (4/5)*u32noteTime_MS;
   }
