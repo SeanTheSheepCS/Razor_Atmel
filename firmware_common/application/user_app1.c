@@ -89,6 +89,7 @@ void UserApp1Initialize(void)
 {
   //Make the LED blink 
   HEARTBEAT_OFF();
+  AllLedsOff();
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -138,26 +139,31 @@ State Machine Function Definitions
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
-{
+{ 
+  
   static bool shouldJingle = FALSE;
-  
-  FestiveLightsPatternOne();
-  
-  if(IsButtonPressed(BUTTON0))
+
+  if(WasButtonPressed(BUTTON0))
   {
     shouldJingle = TRUE;
+    AllLedsOff();
+    FestiveLightsPatternOne(TRUE);
+    ButtonAcknowledge(BUTTON0);
   }
   if(IsButtonPressed(BUTTON1))
   {
     shouldJingle = FALSE;
+    AllLedsOff();
+    PWMAudioOff(BUZZER1);
   }
   if(shouldJingle)
   {
     shouldJingle = Jingle(FALSE);
+    FestiveLightsPatternOne(FALSE);
   }
   else
   {
-    PWMAudioOff(BUZZER1);
+    CycleLeds();
   }
   
   if(IsButtonHeld(BUTTON1,500))
@@ -166,7 +172,87 @@ static void UserApp1SM_Idle(void)
   }
 } /* end UserApp1SM_Idle() */
     
+static void AllLedsOff(void)
+{
+  static LedNumberType aeAllLeds[] = {GREEN0,RED0,BLUE0,GREEN1,RED1,BLUE1,GREEN2,RED2,BLUE2,GREEN3,RED3,BLUE3};
+  //static LedNumberType aeCurrentLedOne[] = {GREEN1,RED1,BLUE1};
+  //static LedNumberType aeCurrentLedTwo[] = {GREEN2,RED2,BLUE2};
+  //static LedNumberType aeCurrentLedThree[] = {GREEN3,RED3,BLUE3};
+  for (u32 u32index = 0; u32index < 12; u32index++)
+  {
+    LedOff(aeAllLeds[u32index]);
+  }
+}
 
+static void CycleLeds(void)
+{
+  static LedNumberType aeSelectedLed[] = {GREEN0,BLUE0,RED0};
+  static LedNumberType aeSelectedLedOne[] = {GREEN1,BLUE1,RED1};
+  static LedNumberType aeSelectedLedTwo[] = {GREEN2,BLUE2,RED2};
+  static LedNumberType aeSelectedLedThree[] = {GREEN3,BLUE3,RED3};
+  static bool ascending = TRUE;
+  static u32 u32ledSelector = 0;
+  static u32 u32timePassed_MS = 0;
+  
+  if(u32timePassed_MS < CYCLE_COLOURS_LIMIT_MS)
+  {
+    if(u32timePassed_MS%100==0)
+    {
+      if(ascending)
+      {
+        LedPWM(aeSelectedLed[u32ledSelector],u32timePassed_MS/100);
+        LedPWM(aeSelectedLedOne[u32ledSelector],u32timePassed_MS/100);
+        LedPWM(aeSelectedLedTwo[u32ledSelector],u32timePassed_MS/100);
+        LedPWM(aeSelectedLedThree[u32ledSelector],u32timePassed_MS/100);
+      }
+      else
+      {
+        LedPWM(aeSelectedLed[u32ledSelector],10-u32timePassed_MS/100);
+        LedPWM(aeSelectedLedOne[u32ledSelector],10-u32timePassed_MS/100);
+        LedPWM(aeSelectedLedTwo[u32ledSelector],10-u32timePassed_MS/100);
+        LedPWM(aeSelectedLedThree[u32ledSelector],10-u32timePassed_MS/100);
+      }
+    }
+  }
+  else
+  {
+    if(ascending)
+    {
+      ascending = FALSE;
+      u32timePassed_MS = 0;
+      if(u32ledSelector == 0) //If you selected the green,
+      {
+        u32ledSelector = 2; //You now dim the red.
+      }
+      else if(u32ledSelector == 1) //If you selected the blue,
+      {
+        u32ledSelector = 0; //You now dim the green.
+      }
+      else if(u32ledSelector == 2) //If you selected the red,
+      {
+        u32ledSelector = 1; //You now dim the blue.
+      }
+    }
+    else
+    {
+      ascending = TRUE;
+      u32timePassed_MS = 0;
+      if(u32ledSelector == 0) //If you dimmed the green,
+      {
+        u32ledSelector = 2; //You now light up the red.
+      }
+      else if(u32ledSelector == 1) //If you dimmed the blue,
+      {
+        u32ledSelector = 0; //You now light up the green.
+      }
+      else if(u32ledSelector == 2) //If you dimmed the red,
+      {
+        u32ledSelector = 1; //You now light up the blue.
+      }
+    }
+  }
+  u32timePassed_MS++;
+}
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */
 static void UserApp1SM_Error(void)          
@@ -174,7 +260,7 @@ static void UserApp1SM_Error(void)
   
 } /* end UserApp1SM_Error() */
 
-static void FestiveLightsPatternOne()
+static void FestiveLightsPatternOne(bool reset)
 {
   //Increment counter every millisecond
   static bool hasReachedLED0 = FALSE;
@@ -182,6 +268,17 @@ static void FestiveLightsPatternOne()
   static bool hasReachedLED2 = FALSE;
   static bool hasReachedLED3 = FALSE;
   static u32 u32alternatingColoursCounter = 0;
+  
+  if(reset)
+  {
+    hasReachedLED0 = FALSE;
+    hasReachedLED1 = FALSE;
+    hasReachedLED2 = FALSE;
+    hasReachedLED3 = FALSE;
+    u32alternatingColoursCounter = 0;
+    return;
+  }
+  
   u32alternatingColoursCounter++;
   if((u32alternatingColoursCounter > ALTERNATING_COLOUR_LIMIT_MS)&&(!hasReachedLED0))
   {
@@ -193,18 +290,24 @@ static void FestiveLightsPatternOne()
   {
     //If 1 second has passed, turn on the next LED
     LedPWM(RED1, LED_PWM_35);
+    LedPWM(GREEN0, LED_PWM_35); //Needed since the LED may have been turned off by AllLedsOff()
     hasReachedLED1 = TRUE;
   }
   if(u32alternatingColoursCounter > 3*ALTERNATING_COLOUR_LIMIT_MS&&(!hasReachedLED2))
   {
     //If 1.5 seconds have passed, turn on the next LED
     LedPWM(GREEN2, LED_PWM_35);
+    LedPWM(RED1, LED_PWM_35);
+    LedPWM(GREEN0, LED_PWM_35); //Needed since the LED may have been turned off by AllLedsOff()
     hasReachedLED2 = TRUE;
   }
   if(u32alternatingColoursCounter > 4*ALTERNATING_COLOUR_LIMIT_MS&&(!hasReachedLED3))
   {
     //If 2 seconds have passed, turn on the last LED
     LedPWM(RED3, LED_PWM_35);
+    LedPWM(GREEN2, LED_PWM_35);
+    LedPWM(RED1, LED_PWM_35);
+    LedPWM(GREEN0, LED_PWM_35); //Needed since the LED may have been turned off by AllLedsOff()
     hasReachedLED3 = TRUE;
   }
   if(u32alternatingColoursCounter > 5*ALTERNATING_COLOUR_LIMIT_MS)
@@ -225,9 +328,9 @@ static void FestiveLightsPatternOne()
 
 static bool Jingle(bool reset)
 {
-  static u32 u32timePassed_MS = 0; //The number of millisecounds that the jingle has been played for
+  static u32 u32timePassed_MS = 0; //The number of milliseconds that the jingle has been played for
   static u32 u32jingleQNotesPassed = 0; //The number of quarter notes that have been played in the jingle
-  static u32 u32noteTime_MS = 0;
+  static u32 u32noteTime_MS = 0; //The number of milliseconds the current note is to be played for
   
   if(reset)
   {
@@ -410,6 +513,10 @@ static bool Jingle(bool reset)
     PWMAudioSetFrequency(BUZZER1,D4FREQ_HZ);
     u32noteTime_MS = QUARTERNOTETIME_MS*4;
   }
+  else if(u32jingleQNotesPassed > 64)
+  {
+    return FALSE;
+  }
   
   
   //Buzzer should turn off for the last 100 ms. If the note lasts less than 100ms, then it should wait  1/5 of the length of the note.
@@ -437,6 +544,11 @@ static bool Jingle(bool reset)
   u32timePassed_MS++;
   
   return TRUE;
+}
+
+static bool betterJingle(bool reset)
+{
+  
 }
 
 

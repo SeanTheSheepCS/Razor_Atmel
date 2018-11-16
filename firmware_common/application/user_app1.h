@@ -30,6 +30,7 @@ Constants / Definitions
 **********************************************************************************************************************/
 #define COUNTER_LIMIT_MS (u32)2500
 #define ALTERNATING_COLOUR_LIMIT_MS (u32)500
+#define CYCLE_COLOURS_LIMIT_MS (u32)1000
 
 #define E4FREQ_HZ (u32)330
 #define G4FREQ_HZ (u32)392
@@ -53,7 +54,9 @@ Function Declarations
 /*--------------------------------------------------------------------------------------------------------------------*/
 void UserApp1Initialize(void);
 void UserApp1RunActiveState(void);
-void FestiveLightsPatternOne(void);
+void FestiveLightsPatternOne(bool reset);
+void AllLedsOff(void);
+void CycleLeds(void);
 bool Jingle(bool reset);
 
 
