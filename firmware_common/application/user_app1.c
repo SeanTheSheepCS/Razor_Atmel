@@ -87,9 +87,13 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
+  DebugPrintf("Hello, World!");
+  DebugLineFeed();
+  CapTouchOn();
   //Make the LED blink 
   HEARTBEAT_OFF();
   AllLedsOff();
+  LcdClearScreen();
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -139,10 +143,11 @@ State Machine Function Definitions
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
-{ 
-  
+{
   static bool shouldJingle = FALSE;
-
+  
+  //testLCD();
+  
   if(WasButtonPressed(BUTTON0))
   {
     shouldJingle = TRUE;
@@ -159,11 +164,12 @@ static void UserApp1SM_Idle(void)
   if(shouldJingle)
   {
     shouldJingle = Jingle(FALSE);
+    //shouldJingle = betterJingle(FALSE);
     FestiveLightsPatternOne(FALSE);
   }
   else
   {
-    CycleLeds();
+    //CycleLeds();
   }
   
   if(IsButtonHeld(BUTTON1,500))
@@ -171,7 +177,32 @@ static void UserApp1SM_Idle(void)
     Jingle(TRUE); //This resets the jingle timer.
   }
 } /* end UserApp1SM_Idle() */
-    
+  
+/*
+static void testLCD()
+{
+  u8 array[15][4] = {{0xD1,0x17,0x04,0x0E},
+                    {0x51,0x10,0x04,0x11},
+                    {0x51,0x10,0x04,0x11},
+                    {0xDF,0x17,0x04,0x11},
+                    {0x51,0x10,0x04,0xD1},
+                    {0x51,0x10,0x04,0x91},
+                    {0xD1,0xF7,0x7D,0x4E},
+                    {0x00,0x00,0x00,0x00},
+                    {0x91,0x04,0x04,0x47},
+                    {0x51,0x05,0x05,0x49},
+                    {0x51,0x05,0x05,0x51},
+                    {0x51,0x04,0x04,0x51},
+                    {0x55,0x04,0x04,0x51},
+                    {0x55,0x04,0x04,0x09},
+                    {0x8E,0x7D,0x7D,0x47}};
+  //u8 array[9] = {1,1,1,1,1,1,1,1,1
+
+  const u8* adress = &(array[0][0]);
+  PixelBlockType block = {0,0,15,(8*4)};
+  LcdLoadBitmap(adress,&block);
+}
+*/
 static void AllLedsOff(void)
 {
   static LedNumberType aeAllLeds[] = {GREEN0,RED0,BLUE0,GREEN1,RED1,BLUE1,GREEN2,RED2,BLUE2,GREEN3,RED3,BLUE3};
@@ -186,6 +217,7 @@ static void AllLedsOff(void)
 
 static void CycleLeds(void)
 {
+  
   static LedNumberType aeSelectedLed[] = {GREEN0,BLUE0,RED0};
   static LedNumberType aeSelectedLedOne[] = {GREEN1,BLUE1,RED1};
   static LedNumberType aeSelectedLedTwo[] = {GREEN2,BLUE2,RED2};
@@ -196,23 +228,24 @@ static void CycleLeds(void)
   
   if(u32timePassed_MS < CYCLE_COLOURS_LIMIT_MS)
   {
-    if(u32timePassed_MS%100==0)
+    if(u32timePassed_MS%(CYCLE_COLOURS_LIMIT_MS/5)==0)
     {
       if(ascending)
       {
-        LedPWM(aeSelectedLed[u32ledSelector],u32timePassed_MS/100);
-        LedPWM(aeSelectedLedOne[u32ledSelector],u32timePassed_MS/100);
-        LedPWM(aeSelectedLedTwo[u32ledSelector],u32timePassed_MS/100);
-        LedPWM(aeSelectedLedThree[u32ledSelector],u32timePassed_MS/100);
+        LedPWM(aeSelectedLed[u32ledSelector],(u32timePassed_MS/(CYCLE_COLOURS_LIMIT_MS/5)));
+        LedPWM(aeSelectedLedOne[u32ledSelector],(u32timePassed_MS/(CYCLE_COLOURS_LIMIT_MS/5)));
+        LedPWM(aeSelectedLedTwo[u32ledSelector],(u32timePassed_MS/(CYCLE_COLOURS_LIMIT_MS/5)));
+        LedPWM(aeSelectedLedThree[u32ledSelector],(u32timePassed_MS/(CYCLE_COLOURS_LIMIT_MS/5)));
       }
       else
       {
-        LedPWM(aeSelectedLed[u32ledSelector],10-u32timePassed_MS/100);
-        LedPWM(aeSelectedLedOne[u32ledSelector],10-u32timePassed_MS/100);
-        LedPWM(aeSelectedLedTwo[u32ledSelector],10-u32timePassed_MS/100);
-        LedPWM(aeSelectedLedThree[u32ledSelector],10-u32timePassed_MS/100);
+        LedPWM(aeSelectedLed[u32ledSelector],5-(u32timePassed_MS/(CYCLE_COLOURS_LIMIT_MS/5)));
+        LedPWM(aeSelectedLedOne[u32ledSelector],10-(u32timePassed_MS/(CYCLE_COLOURS_LIMIT_MS/5)));
+        LedPWM(aeSelectedLedTwo[u32ledSelector],10-(u32timePassed_MS/(CYCLE_COLOURS_LIMIT_MS/5)));
+        LedPWM(aeSelectedLedThree[u32ledSelector],10-(u32timePassed_MS/(CYCLE_COLOURS_LIMIT_MS/5)));
       }
     }
+    
   }
   else
   {
@@ -252,6 +285,7 @@ static void CycleLeds(void)
     }
   }
   u32timePassed_MS++;
+  
 }
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */
@@ -548,7 +582,45 @@ static bool Jingle(bool reset)
 
 static bool betterJingle(bool reset)
 {
-  
+  static u32 u32noteList[] = {E4, E4, E4, E4, E4, E4, E4, G4, C4, D4, E4, F4, F4, F4, F4, F4, E4, E4, E4, E4, E4, D4, D4, E4, D4, G4, 0 };
+  static u32 u32timeList[] = {QN, QN, HN, QN, QN, HN, QN, QN, QN, QN, FN, QN, QN, QN, QN, QN, QN, QN, EN, EN, QN, QN, QN, QN, HN, QN, QN};
+  static u32 u32totalNotes = 27;
+  static u32 u32currentNoteIndex = 0;
+  if(isTimeUp(FALSE, u32timeList[u32currentNoteIndex])) //Advances only when you are done playing the note
+  {
+    u32currentNoteIndex++;
+    if(u32currentNoteIndex >= u32totalNotes)
+    {
+      return FALSE;
+    }
+    if(u32noteList[u32currentNoteIndex]==0)
+    {
+      //SILENT NOTE.
+      PWMAudioOff(BUZZER1);
+    }
+    else
+    {
+      PWMAudioSetFrequency(BUZZER1, u32noteList[u32currentNoteIndex]);
+      PWMAudioOn(BUZZER1);
+    }
+    isTimeUp(TRUE, 0); //Resets istimeup to it's original state
+  }
+  return TRUE;
+}
+
+static bool isTimeUp(bool reset, u32 u32time)
+{
+  static u32 u32timePassed = 0;
+  if(reset)
+  {
+    u32timePassed = 0;
+    return FALSE;
+  }
+  else if(u32timePassed >= u32time)
+  {
+    u32timePassed++;
+    return TRUE;
+  }
 }
 
 

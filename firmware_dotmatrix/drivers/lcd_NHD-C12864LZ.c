@@ -414,7 +414,6 @@ void LcdClearPixel(PixelAddressType* sPixelAddress_)
   
 } /* end LcdClearPixel */
 
-
 /*----------------------------------------------------------------------------------------------------------------------
 Function: LcdLoadBitmap
 
