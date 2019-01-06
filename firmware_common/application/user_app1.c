@@ -42,7 +42,7 @@ All Global variable names shall start with "G_UserApp1"
 ***********************************************************************************************************************/
 /* New variables */
 volatile u32 G_u32UserApp1Flags;                       /* Global state flags */
-
+u8 u8volume = 76; /* The volume */
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Existing variables (defined in other files -- should all contain the "extern" keyword) */
@@ -87,6 +87,7 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
+  LcdClearScreen();
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -137,7 +138,7 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  
+  renderBar();
 } /* end UserApp1SM_Idle() */
   
 /*
@@ -165,6 +166,55 @@ static void testLCD()
   LcdLoadBitmap(adress,&block);
 }
 */
+
+static void renderBar(void)
+{
+  u8 u8arr_Bar[31][1] = {{0x00},
+                 {0x7E},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x42},
+                 {0x7E},
+                 {0x00}};
+  //Bar refers to the vanilla bar right now, which assumes no volume. We now mess with the bar as necessary.
+
+  //Volume goes from top to bottom, beginning at the top if volume is at max or the bottom if the volume is at the bottom.
+  //A volume of 100 means we should begin at 3 and go to 27, a volume of 96 means we should start at 4 and go to 27. Volume only increments in fours.
+  u8 u8startIndex = 28 - (u8volume / 4);
+  for(u8 u8index = u8startIndex; u8index <= 27; u8index++)
+  {
+    u8arr_Bar[u8index][0] = 0x5A; //This represents a block of the bar filled in.
+  }
+  
+  
+  const u8* u8pAddress = &(u8arr_Bar[0][0]);
+  PixelBlockType PBTbarInfo = {0,0,30, (1*8)};
+  LcdLoadBitmap(u8pAddress,&PBTbarInfo);
+}
 
 static void UserApp1SM_Error(void)          
 {
