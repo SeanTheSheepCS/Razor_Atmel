@@ -88,6 +88,7 @@ Promises:
 void UserApp1Initialize(void)
 {
   LcdClearScreen();
+  CapTouchOn();
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -138,34 +139,44 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  renderBar();
+  manageVolumeBar();
+  manageBottomButtons();
 } /* end UserApp1SM_Idle() */
-  
-/*
-static void testLCD()
-{
-  u8 array[15][4] = {{0xD1,0x17,0x04,0x0E},
-                    {0x51,0x10,0x04,0x11},
-                    {0x51,0x10,0x04,0x11},
-                    {0xDF,0x17,0x04,0x11},
-                    {0x51,0x10,0x04,0xD1},
-                    {0x51,0x10,0x04,0x91},
-                    {0xD1,0xF7,0x7D,0x4E},
-                    {0x00,0x00,0x00,0x00},
-                    {0x91,0x04,0x04,0x47},
-                    {0x51,0x05,0x05,0x49},
-                    {0x51,0x05,0x05,0x51},
-                    {0x51,0x04,0x04,0x51},
-                    {0x55,0x04,0x04,0x51},
-                    {0x55,0x04,0x04,0x09},
-                    {0x8E,0x7D,0x7D,0x47}};
-  //u8 array[9] = {1,1,1,1,1,1,1,1,1
 
-  const u8* adress = &(array[0][0]);
-  PixelBlockType block = {0,0,15,(8*4)};
-  LcdLoadBitmap(adress,&block);
+static void manageBottomButtons(void)
+{
+  static u8 bottomRow = 63; //The bottom row of the screen is row 63. 
+  renderHomeButtonNineByNine(bottomRow - 9,0);
 }
-*/
+
+static void manageVolumeBar(void)
+{
+  static u8 u8nextVolume = 0;
+  static u32 u32millisecondsPassedSinceLastChange = 0;
+  u8nextVolume = 100 - ((100.0/255.0)*CaptouchCurrentVSlidePosition()); //The "100 minus" thing is needed as the volume bar works in the opposite direction as the slider. (100/255) is to set the max slider value to max volume
+  u8nextVolume = (u8nextVolume/4)*4; //Rounds it to the nearest multiple of four (?)
+  if(u8volume == u8nextVolume)
+  {
+    //No change has taken place since the last time. How long has it been?
+    if(u32millisecondsPassedSinceLastChange > 5000)
+    {
+      unRenderBar();
+    }
+    else
+    {
+      u8volume = u8nextVolume;
+      u32millisecondsPassedSinceLastChange++;
+      renderBar();
+    }
+  }
+  else
+  {
+    //The volume has changed!
+    u8volume = u8nextVolume;
+    u32millisecondsPassedSinceLastChange = 0;
+    renderBar();
+  }
+}
 
 static void renderBar(void)
 {
@@ -216,11 +227,65 @@ static void renderBar(void)
   LcdLoadBitmap(u8pAddress,&PBTbarInfo);
 }
 
+static void unRenderBar(void)
+{
+  u8 u8arr_Bar[31][1] = {{0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00},
+                 {0x00}};
+  //Rendering this will overwrite the bar
+  const u8* u8pAddress = &(u8arr_Bar[0][0]);
+  PixelBlockType PBTbarInfo = {0,0,30, (1*8)};
+  LcdLoadBitmap(u8pAddress,&PBTbarInfo);
+}
+
 static void UserApp1SM_Error(void)          
 {
   
 } /* end UserApp1SM_Error() */
 
+static void renderHomeButtonNineByNine(u16 u16row, u16 u16col)
+{
+  u8 u8homeButton[9][2] = {{0xFF, 0x01}, //55
+                           {0x01, 0x01}, //56
+                           {0x11, 0x01}, //57
+                           {0x39, 0x01}, //58
+                           {0x7D, 0x01}, //59
+                           {0x29, 0x01}, //60
+                           {0x29, 0x01}, //61
+                           {0x01, 0x01}, //62
+                           {0xFF, 0x01}}; //63
+  const u8* u8pAddress = &(u8homeButton[0][0]);
+  PixelBlockType PBThomeButtonInfo = {u16row,u16col,9, (2*8)};
+  LcdLoadBitmap(u8pAddress,&PBThomeButtonInfo);                           
+}
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* End of File                                                                                                        */
 /*--------------------------------------------------------------------------------------------------------------------*/

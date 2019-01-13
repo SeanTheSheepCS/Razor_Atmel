@@ -38,6 +38,10 @@ Function Declarations
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 static void renderBar(void);
+static void unRenderBar(void);
+static void manageVolumeBar(void);
+static void manageBottomButtons(void);
+static void renderHomeButtonNineByNine(u16 row, u16 col);
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Protected functions                                                                                                */
