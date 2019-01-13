@@ -41,7 +41,9 @@ static void renderBar(void);
 static void unRenderBar(void);
 static void manageVolumeBar(void);
 static void manageBottomButtons(void);
-static void renderHomeButtonNineByNine(u16 row, u16 col);
+static void renderHomeButtonNineByNine(u16 row, u16 col, bool shouldInvert);
+static void renderBackButtonNineByNine(u16 row, u16 col, bool shouldInvert);
+static void invertButtonBitMapNineByNine(u8* u8pMap, u8 u8rows, u8 u8cols);
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Protected functions                                                                                                */

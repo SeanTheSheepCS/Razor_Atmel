@@ -145,8 +145,21 @@ static void UserApp1SM_Idle(void)
 
 static void manageBottomButtons(void)
 {
-  static u8 bottomRow = 63; //The bottom row of the screen is row 63. 
-  renderHomeButtonNineByNine(bottomRow - 9,0);
+  static u8 u8bottomRow = 63; //The bottom row of the screen is row 63.
+  static u8 u8noOfComponents = 2; //The number of components
+  static u8 u8buttonZeroCycleCount = 0; //The number of button zero presses, with a max of noOfComponents
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    u8buttonZeroCycleCount++;
+    if(u8buttonZeroCycleCount == u8noOfComponents)
+    {
+      //We reached the last component, so we should go back to the start.
+      u8buttonZeroCycleCount = 0;
+    }
+  }
+  renderHomeButtonNineByNine(u8bottomRow - 9,0, u8buttonZeroCycleCount == 0); //Invert if cycle is on zero
+  renderBackButtonNineByNine(u8bottomRow - 9,8, u8buttonZeroCycleCount == 1); //Invert if cycle is on one
 }
 
 static void manageVolumeBar(void)
@@ -271,9 +284,9 @@ static void UserApp1SM_Error(void)
   
 } /* end UserApp1SM_Error() */
 
-static void renderHomeButtonNineByNine(u16 u16row, u16 u16col)
+static void renderHomeButtonNineByNine(u16 u16row, u16 u16col, bool shouldInvert)
 {
-  u8 u8homeButton[9][2] = {{0xFF, 0x01}, //55
+  u8 u8pphomeButton[9][2] = {{0xFF, 0x01}, //55
                            {0x01, 0x01}, //56
                            {0x11, 0x01}, //57
                            {0x39, 0x01}, //58
@@ -282,9 +295,54 @@ static void renderHomeButtonNineByNine(u16 u16row, u16 u16col)
                            {0x29, 0x01}, //61
                            {0x01, 0x01}, //62
                            {0xFF, 0x01}}; //63
-  const u8* u8pAddress = &(u8homeButton[0][0]);
+  if(shouldInvert)
+  {
+    invertButtonBitMapNineByNine(&(u8pphomeButton[0][0]),9,2);
+  }
+  const u8* u8pAddress = &(u8pphomeButton[0][0]);
   PixelBlockType PBThomeButtonInfo = {u16row,u16col,9, (2*8)};
   LcdLoadBitmap(u8pAddress,&PBThomeButtonInfo);                           
+}
+
+static void renderBackButtonNineByNine(u16 u16row, u16 u16col, bool shouldInvert)
+{
+  u8 u8ppbackButton[9][2] = {{0xFF, 0x01}, //55
+                           {0x01, 0x01}, //56
+                           {0x51, 0x01}, //57
+                           {0x79, 0x01}, //58
+                           {0x7D, 0x01}, //59
+                           {0x79, 0x01}, //60
+                           {0x51, 0x01}, //61
+                           {0x01, 0x01}, //62
+                           {0xFF, 0x01}}; //63
+  if(shouldInvert)
+  {
+    invertButtonBitMapNineByNine(&(u8ppbackButton[0][0]),9,2);
+  }
+  const u8* u8pAddress = &(u8ppbackButton[0][0]);
+  PixelBlockType PBTbackButtonInfo = {u16row,u16col,9, (2*8)};
+  LcdLoadBitmap(u8pAddress,&PBTbackButtonInfo);                           
+}
+
+static void invertButtonBitMapNineByNine(u8* u8pMap,u8 u8rows, u8 u8cols)
+{
+  for(u8 i = 0; i < (u8rows*u8cols); i++)
+  {
+    //For a nine by nine button, the 1, 3, 5, 7, ... indices are ignored since they form up the edge of the button
+    if(i%2==0)
+    {
+      if(u8pMap[i] == 0xFF)
+      {
+        //This is either the top or bottom ledge, leave it alone.
+      }
+      else
+      {
+        //Not the top or bottom edge, inverting time!
+        u8pMap[i] = 0xFF - u8pMap[i]; //This inverts the button but ruins our edge!
+        u8pMap[i] += 1; //Returns our edge!
+      }
+    }
+  }
 }
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* End of File                                                                                                        */
