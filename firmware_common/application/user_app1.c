@@ -48,9 +48,13 @@ u8 u8volume = 76; /* The volume */
 /* Existing variables (defined in other files -- should all contain the "extern" keyword) */
 extern volatile u32 G_u32SystemFlags;                  /* From main.c */
 extern volatile u32 G_u32ApplicationFlags;             /* From main.c */
-
 extern volatile u32 G_u32SystemTime1ms;                /* From board-specific source file */
 extern volatile u32 G_u32SystemTime1s;                 /* From board-specific source file */
+
+extern u32 G_u32AntApiCurrentMessageTimeStamp;                            // From ant_api.c
+extern AntApplicationMessageType G_eAntApiCurrentMessageClass;            // From ant_api.c
+extern u8 G_au8AntApiCurrentMessageBytes[ANT_APPLICATION_MESSAGE_BYTES];  // From ant_api.c
+extern AntExtendedDataType G_sAntApiCurrentMessageExtData;                // From ant_api.c
 
 
 /***********************************************************************************************************************
@@ -58,8 +62,9 @@ Global variable definitions with scope limited to this local application.
 Variable names shall start with "UserApp1_" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
-//static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
-
+static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
+static AntAssignChannelInfoType UserApp1_sChannelInfo = {0};
+static u8* UserApp1_au8MessageFail = "A failure has occurred, most likely with ant!\n";
 
 /**********************************************************************************************************************
 Function Definitions
@@ -87,20 +92,42 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
+  /*
   LcdClearScreen();
   CapTouchOn();
-  /* If good initialization, set state to Idle */
-  if( 1 )
+  */
+  /* Configure ANT for this application */
+  UserApp1_sChannelInfo.AntChannel          = ANT_CHANNEL_USERAPP;
+  UserApp1_sChannelInfo.AntChannelType      = ANT_CHANNEL_TYPE_USERAPP;
+  UserApp1_sChannelInfo.AntChannelPeriodLo  = ANT_CHANNEL_PERIOD_LO_USERAPP;
+  UserApp1_sChannelInfo.AntChannelPeriodHi  = ANT_CHANNEL_PERIOD_HI_USERAPP;
+ 
+  UserApp1_sChannelInfo.AntDeviceIdLo       = ANT_DEVICEID_LO_USERAPP;
+  UserApp1_sChannelInfo.AntDeviceIdHi       = ANT_DEVICEID_HI_USERAPP;
+  UserApp1_sChannelInfo.AntDeviceType       = ANT_DEVICE_TYPE_USERAPP;
+  UserApp1_sChannelInfo.AntTransmissionType = ANT_TRANSMISSION_TYPE_USERAPP;
+  UserApp1_sChannelInfo.AntFrequency        = ANT_FREQUENCY_USERAPP;
+  UserApp1_sChannelInfo.AntTxPower          = ANT_TX_POWER_USERAPP;
+
+  UserApp1_sChannelInfo.AntNetwork = ANT_NETWORK_DEFAULT;
+  
+  for( u8 i = 0; i < ANT_NETWORK_NUMBER_BYTES; i++)     
   {
-    UserApp1_StateMachine = UserApp1SM_Idle;
+    UserApp1_sChannelInfo.AntNetworkKey[i] = ANT_DEFAULT_NETWORK_KEY;
+  }
+  
+  if( AntAssignChannel(&UserApp1_sChannelInfo))
+  {
+    UserApp1_u32Timeout = G_u32SystemTime1ms;
+    UserApp1_StateMachine = UserApp1SM_AntChannelAssign;
   }
   else
   {
-    /* The task isn't properly initialized, so shut it down and don't run */
+    DebugPrintf(UserApp1_au8MessageFail);
     UserApp1_StateMachine = UserApp1SM_Error;
   }
-
 } /* end UserApp1Initialize() */
+
 
   
 /*----------------------------------------------------------------------------------------------------------------------
@@ -135,13 +162,84 @@ void UserApp1RunActiveState(void)
 State Machine Function Definitions
 **********************************************************************************************************************/
 
+/* Wait for any ANT channel assignment */
+static void UserApp1SM_AntChannelAssign(void)
+{
+  u8 u8status = AntRadioStatusChannel(ANT_CHANNEL_USERAPP);
+  if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) == ANT_CONFIGURED)
+  {
+    /*Channel assignment was successful!*/
+    DebugPrintf("Channel Assignment Successful!");
+    AntOpenChannelNumber(ANT_CHANNEL_USERAPP);
+    UserApp1_StateMachine = UserApp1SM_Idle;
+  }
+  
+  if(IsTimeUp(&UserApp1_u32Timeout, 5000))
+  {
+    DebugPrintf(UserApp1_au8MessageFail);
+    UserApp1_StateMachine = UserApp1SM_Error;
+  }
+}
+
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  antTest();
+  
+  
   manageVolumeBar();
   manageBottomButtons();
 } /* end UserApp1SM_Idle() */
+
+static void antTest(void)
+{
+  static u8 au8TestMessage[] = {0, 0, 0, 0, 0xA5, 0, 0, 0};
+  u8 au8dataContent[] = "xxxxxxxxxxxxxxxx";
+  
+  //Update text if a button was pressed
+  
+  //au8TestMessage[0] = 0x00;
+  if(IsButtonPressed(BUTTON0))
+  {
+    au8TestMessage[0] = 0xff;
+  }
+  
+  //ANT STUFF
+  if(AntReadAppMessageBuffer())
+  {
+    /* New message from ANT task */
+    if(G_eAntApiCurrentMessageClass == ANT_DATA)
+    {
+      //We were given data
+      u8 u8ThisIsATestIngoreThisPlease = 7;
+      for(u8 i = 0; i < ANT_DATA_BYTES; i++)
+      {
+        //au8dataContent[2*i] = (G_au8AntApiCurrentMessageBytes[i] / 16);
+        //au8dataContent[(2*i)+1] = (G_au8AntApiCurrentMessageBytes[i] % 16);
+        au8dataContent[i] = G_au8AntApiCurrentMessageBytes[i];
+        for(u8 j = 0; j < 4; j++)
+        {
+          au8TestMessage[j] = au8dataContent[j];
+        }
+      }
+    }
+    else if (G_eAntApiCurrentMessageClass == ANT_TICK)
+    {
+      /* A channel period has gone by, typically new data should be queued to be sent here */
+      au8TestMessage[7]++;
+      if(au8TestMessage[7] == 0)
+      {
+        au8TestMessage[6]++;
+        if(au8TestMessage[6] == 0)
+        {
+          au8TestMessage[5]++;
+        }
+      }
+      AntQueueBroadcastMessage(ANT_CHANNEL_USERAPP, au8TestMessage);
+    }
+  }
+}
 
 static void manageBottomButtons(void)
 {
