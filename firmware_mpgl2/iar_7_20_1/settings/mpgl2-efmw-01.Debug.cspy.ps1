@@ -23,9 +23,9 @@ param([String]$debugfile = "");
 
 if ($debugfile -eq "")
 {
-& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.general.xcl" --backend -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.driver.xcl" 
+& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_mpgl2\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --backend -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_mpgl2\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
 }
 else
 {
-& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_ascii\iar_8_10_1\settings\eie_ascii-01.Debug.driver.xcl" 
+& "D:\Program Files (x86)\IAR Systems\Embedded Workbench 8.0\common\bin\cspybat" -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_mpgl2\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\seank\OneDrive\Desktop\Everything\EIE\Razor_Atmel\firmware_mpgl2\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
 }
