@@ -192,11 +192,6 @@ static void UserApp1SM_AntChannelAssign(void)
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  // FUNCTIONALITY I DO NOT WANT RIGHT NOW
-  //antMasterTest();
-  //manageVolumeBar();
-  //anageBottomButtons();
-
   if(WasButtonPressed(BUTTON1))
   {
     ButtonAcknowledge(BUTTON1);
@@ -357,7 +352,7 @@ static void UserApp1SM_WaitChannelClose(void)
   }
 }
 
-/*
+
 static void interpretData(u8* au8DataContent)
 {
   if(au8DataContent[0] == 0x90)
@@ -373,256 +368,12 @@ static void interpretData(u8* au8DataContent)
     //
   }
 }
-*/
-static void antMasterTest(void)
-{
-  static u8 au8TestMessage[] = {0, 0, 0, 0, 0xA5, 0, 0, 0};
-  u8 au8dataContent[] = "xxxxxxxxxxxxxxxx";
-
-  //Update text if a button was pressed
-
-  //au8TestMessage[0] = 0x00;
-  if(IsButtonPressed(BUTTON0))
-  {
-    au8TestMessage[0] = 0xff;
-  }
-
-  //ANT STUFF
-  if(AntReadAppMessageBuffer())
-  {
-    /* New message from ANT task */
-    if(G_eAntApiCurrentMessageClass == ANT_DATA)
-    {
-      //We were given data
-      for(u8 i = 0; i < ANT_DATA_BYTES; i++)
-      {
-        //au8dataContent[2*i] = (G_au8AntApiCurrentMessageBytes[i] / 16);
-        //au8dataContent[(2*i)+1] = (G_au8AntApiCurrentMessageBytes[i] % 16);
-        au8dataContent[i] = G_au8AntApiCurrentMessageBytes[i];
-        for(u8 j = 0; j < 4; j++)
-        {
-          au8TestMessage[j] = au8dataContent[j];
-        }
-      }
-    }
-    else if (G_eAntApiCurrentMessageClass == ANT_TICK)
-    {
-      /* A channel period has gone by, typically new data should be queued to be sent here */
-      au8TestMessage[7]++;
-      if(au8TestMessage[7] == 0)
-      {
-        au8TestMessage[6]++;
-        if(au8TestMessage[6] == 0)
-        {
-          au8TestMessage[5]++;
-        }
-      }
-      AntQueueBroadcastMessage(ANT_CHANNEL_USERAPP, au8TestMessage);
-    }
-  }
-}
-
-static void manageBottomButtons(void)
-{
-  static u8 u8bottomRow = 63; //The bottom row of the screen is row 63.
-  static u8 u8noOfComponents = 2; //The number of components
-  static u8 u8buttonZeroCycleCount = 0; //The number of button zero presses, with a max of noOfComponents
-  if(WasButtonPressed(BUTTON0))
-  {
-    ButtonAcknowledge(BUTTON0);
-    u8buttonZeroCycleCount++;
-    if(u8buttonZeroCycleCount == u8noOfComponents)
-    {
-      //We reached the last component, so we should go back to the start.
-      u8buttonZeroCycleCount = 0;
-    }
-  }
-  renderHomeButtonNineByNine(u8bottomRow - 9,0, u8buttonZeroCycleCount == 0); //Invert if cycle is on zero
-  renderBackButtonNineByNine(u8bottomRow - 9,8, u8buttonZeroCycleCount == 1); //Invert if cycle is on one
-}
-
-static void manageVolumeBar(void)
-{
-  static u8 u8nextVolume = 0;
-  static u32 u32millisecondsPassedSinceLastChange = 0;
-  u8nextVolume = 100 - ((100.0/255.0)*CaptouchCurrentVSlidePosition()); //The "100 minus" thing is needed as the volume bar works in the opposite direction as the slider. (100/255) is to set the max slider value to max volume
-  u8nextVolume = (u8nextVolume/4)*4; //Rounds it to the nearest multiple of four (?)
-  if(u8volume == u8nextVolume)
-  {
-    //No change has taken place since the last time. How long has it been?
-    if(u32millisecondsPassedSinceLastChange > 5000)
-    {
-      unRenderBar();
-    }
-    else
-    {
-      u8volume = u8nextVolume;
-      u32millisecondsPassedSinceLastChange++;
-      renderBar();
-    }
-  }
-  else
-  {
-    //The volume has changed!
-    u8volume = u8nextVolume;
-    u32millisecondsPassedSinceLastChange = 0;
-    renderBar();
-  }
-}
-
-static void renderBar(void)
-{
-  u8 u8arr_Bar[31][1] = {{0x00},
-                 {0x7E},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x42},
-                 {0x7E},
-                 {0x00}};
-  //Bar refers to the vanilla bar right now, which assumes no volume. We now mess with the bar as necessary.
-
-  //Volume goes from top to bottom, beginning at the top if volume is at max or the bottom if the volume is at the bottom.
-  //A volume of 100 means we should begin at 3 and go to 27, a volume of 96 means we should start at 4 and go to 27. Volume only increments in fours.
-  u8 u8startIndex = 28 - (u8volume / 4);
-  for(u8 u8index = u8startIndex; u8index <= 27; u8index++)
-  {
-    u8arr_Bar[u8index][0] = 0x5A; //This represents a block of the bar filled in.
-  }
-
-
-  const u8* u8pAddress = &(u8arr_Bar[0][0]);
-  PixelBlockType PBTbarInfo = {0,0,30, (1*8)};
-  LcdLoadBitmap(u8pAddress,&PBTbarInfo);
-}
-
-static void unRenderBar(void)
-{
-  u8 u8arr_Bar[31][1] = {{0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00},
-                 {0x00}};
-  //Rendering this will overwrite the bar
-  const u8* u8pAddress = &(u8arr_Bar[0][0]);
-  PixelBlockType PBTbarInfo = {0,0,30, (1*8)};
-  LcdLoadBitmap(u8pAddress,&PBTbarInfo);
-}
 
 static void UserApp1SM_Error(void)
 {
 
 } /* end UserApp1SM_Error() */
 
-static void renderHomeButtonNineByNine(u16 u16row, u16 u16col, bool shouldInvert)
-{
-  u8 u8pphomeButton[9][2] = {{0xFF, 0x01}, //55
-                           {0x01, 0x01}, //56
-                           {0x11, 0x01}, //57
-                           {0x39, 0x01}, //58
-                           {0x7D, 0x01}, //59
-                           {0x29, 0x01}, //60
-                           {0x29, 0x01}, //61
-                           {0x01, 0x01}, //62
-                           {0xFF, 0x01}}; //63
-  if(shouldInvert)
-  {
-    invertButtonBitMapNineByNine(&(u8pphomeButton[0][0]),9,2);
-  }
-  const u8* u8pAddress = &(u8pphomeButton[0][0]);
-  PixelBlockType PBThomeButtonInfo = {u16row,u16col,9, (2*8)};
-  LcdLoadBitmap(u8pAddress,&PBThomeButtonInfo);
-}
-
-static void renderBackButtonNineByNine(u16 u16row, u16 u16col, bool shouldInvert)
-{
-  u8 u8ppbackButton[9][2] = {{0xFF, 0x01}, //55
-                           {0x01, 0x01}, //56
-                           {0x51, 0x01}, //57
-                           {0x79, 0x01}, //58
-                           {0x7D, 0x01}, //59
-                           {0x79, 0x01}, //60
-                           {0x51, 0x01}, //61
-                           {0x01, 0x01}, //62
-                           {0xFF, 0x01}}; //63
-  if(shouldInvert)
-  {
-    invertButtonBitMapNineByNine(&(u8ppbackButton[0][0]),9,2);
-  }
-  const u8* u8pAddress = &(u8ppbackButton[0][0]);
-  PixelBlockType PBTbackButtonInfo = {u16row,u16col,9, (2*8)};
-  LcdLoadBitmap(u8pAddress,&PBTbackButtonInfo);
-}
-
-static void invertButtonBitMapNineByNine(u8* u8pMap,u8 u8rows, u8 u8cols)
-{
-  for(u8 i = 0; i < (u8rows*u8cols); i++)
-  {
-    //For a nine by nine button, the 1, 3, 5, 7, ... indices are ignored since they form up the edge of the button
-    if(i%2==0)
-    {
-      if(u8pMap[i] == 0xFF)
-      {
-        //This is either the top or bottom ledge, leave it alone.
-      }
-      else
-      {
-        //Not the top or bottom edge, inverting time!
-        u8pMap[i] = 0xFF - u8pMap[i]; //This inverts the button but ruins our edge!
-        u8pMap[i] += 1; //Returns our edge!
-      }
-    }
-  }
-}
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* End of File                                                                                                        */
 /*--------------------------------------------------------------------------------------------------------------------*/
