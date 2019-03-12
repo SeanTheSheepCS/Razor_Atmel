@@ -65,6 +65,8 @@ static fnCode_type UserApp1_StateMachine;            /* The state machine functi
 static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
 static AntAssignChannelInfoType UserApp1_sChannelInfo = {0};
 static u8* UserApp1_au8MessageFail = "A failure has occurred, most likely with ant!\n";
+static u32 UserApp1_u32DataMsgCount = 0; /* ANT_DATA packets recieved */
+static u32 UserApp1_u32TickMsgCount = 0;
 
 /**********************************************************************************************************************
 Function Definitions
@@ -92,10 +94,12 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
-  /*
+
   LcdClearScreen();
   CapTouchOn();
-  */
+
+  LedOn(RED0);
+
   /* Configure ANT for this application */
   UserApp1_sChannelInfo.AntChannel          = ANT_CHANNEL_USERAPP;
   UserApp1_sChannelInfo.AntChannelType      = ANT_CHANNEL_TYPE_USERAPP;
@@ -118,12 +122,15 @@ void UserApp1Initialize(void)
 
   if( AntAssignChannel(&UserApp1_sChannelInfo))
   {
+    //Channel has been assigned, change the led colour to purple.
+    LedOn(BLUE0);
     UserApp1_u32Timeout = G_u32SystemTime1ms;
-    UserApp1_StateMachine = UserApp1SM_AntChannelAssign;
+    UserApp1_StateMachine = UserApp1SM_WaitChannelOpen;
   }
   else
   {
     DebugPrintf(UserApp1_au8MessageFail);
+    LedBlink(RED0, LED_4HZ);
     UserApp1_StateMachine = UserApp1SM_Error;
   }
 } /* end UserApp1Initialize() */
@@ -185,13 +192,188 @@ static void UserApp1SM_AntChannelAssign(void)
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  antMasterTest();
+  // FUNCTIONALITY I DO NOT WANT RIGHT NOW
+  //antMasterTest();
+  //manageVolumeBar();
+  //anageBottomButtons();
 
-
-  manageVolumeBar();
-  manageBottomButtons();
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    AntOpenChannelNumber(ANT_CHANNEL_USERAPP);
+    LedOff(RED0);
+    LedOff(BLUE0);
+    LedBlink(GREEN0, LED_2HZ);
+    UserApp1_u32Timeout = G_u32SystemTime1ms;
+    UserApp1_StateMachine = UserApp1SM_WaitChannelOpen;
+  }
 } /* end UserApp1SM_Idle() */
 
+static void UserApp1SM_WaitChannelOpen(void)
+{
+  if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) == ANT_OPEN)
+  {
+    LedOn(GREEN0);
+    UserApp1_StateMachine = UserApp1SM_ChannelOpen;
+  }
+
+  if( IsTimeUp(&UserApp1_u32Timeout, TIMEOUT_VALUE))
+  {
+    LedOff(GREEN0);
+    LedOn(BLUE0);
+    LedOn(RED0);
+    UserApp1_StateMachine = UserApp1SM_Idle;
+  }
+}
+
+static void UserApp1SM_ChannelOpen(void)
+{
+  static u8 u8LastState = 0xff;
+  static u8 au8TickMessage[] = "EVENT x\n\r"; /* "x" at index [6] will be replaced by the current code */
+  static u8 au8DataContent[] = "xxxxxxxxxxxxxxxx";
+  static u8 au8LastAntData[ANT_APPLICATION_MESSAGE_BYTES] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
+  static u8 au8TestMessage[] = {0,0,0,0,0xA5,0,0,0};
+  bool bGotNewData;
+
+  /* Channel stays open until the button is pressed again */
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+
+    /* Queues closing the channel. Initializes the u8LastState variable and changes the
+     * LED to blinking green to indicate the channel is closing
+     */
+    AntCloseChannelNumber(ANT_CHANNEL_USERAPP);
+    u8LastState = 0xff;
+    LedOff(GREEN0);
+    LedBlink(GREEN0, LED_2HZ);
+
+    /* Changes state and sets the timer */
+    UserApp1_u32Timeout = G_u32SystemTime1ms;
+    UserApp1_StateMachine = UserApp1SM_WaitChannelClose;
+  }
+
+  /* The slave channel may have closed on its own! Has that happened yet? */
+  if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) != ANT_OPEN)
+  {
+    LedOff(GREEN0);
+    LedBlink(GREEN0, LED_2HZ);
+    u8LastState = 0xff;
+
+    UserApp1_u32Timeout = G_u32SystemTime1ms;
+    UserApp1_StateMachine = UserApp1SM_WaitChannelClose;
+  }
+
+  /* Check to see if an ANT message has arrived */
+  if(AntReadAppMessageBuffer())
+  {
+    if(G_eAntApiCurrentMessageClass == ANT_DATA) /* Is this a new data message? */
+    {
+      UserApp1_u32DataMsgCount++;
+      /* Linked with a device = solid blue! */
+      LedOff(GREEN0);
+      LedOn(BLUE0);
+
+      bGotNewData = FALSE;
+      for(u8 i = 0; i < ANT_APPLICATION_MESSAGE_BYTES; i++)
+      {
+        if(G_au8AntApiCurrentMessageBytes[i] != au8LastAntData[i])
+        {
+          bGotNewData = TRUE;
+          au8LastAntData[i] = G_au8AntApiCurrentMessageBytes[i];
+          au8DataContent[2*i] = HexToASCIICharUpper(G_au8AntApiCurrentMessageBytes[i] / 16); // ORIGINAL : ...CurrentData[i]
+          au8DataContent[2*i+1] = HexToASCIICharUpper(G_au8AntApiCurrentMessageBytes[i] % 16); // ORIGINAL: ...CurrentData[i]
+        }
+      }
+      if(bGotNewData)
+      {
+        /* Print the new data */
+        DebugPrintf(au8DataContent);
+        interpretData(au8DataContent);
+        DebugLineFeed();
+      }
+    }
+    else if(G_eAntApiCurrentMessageClass == ANT_TICK) /* Is this a tick message? */
+    {
+      UserApp1_u32TickMsgCount++;
+      if( u8LastState != G_au8AntApiCurrentMessageBytes[ANT_TICK_MSG_EVENT_CODE_INDEX])
+      {
+        u8LastState = G_au8AntApiCurrentMessageBytes[ANT_TICK_MSG_EVENT_CODE_INDEX];
+      }
+      au8TickMessage[6] = HexToASCIICharUpper(u8LastState);
+      DebugPrintf(au8TickMessage);
+
+      switch(u8LastState)
+      {
+        /* Paired but missing messages gives a blue blink */
+        case EVENT_RX_FAIL:
+        {
+          LedOff(GREEN0);
+          LedBlink(BLUE0, LED_2HZ);
+          break;
+        }
+        /* If you stopped searching, turn the LED green */
+        case EVENT_RX_FAIL_GO_TO_SEARCH:
+        {
+          LedOff(BLUE0);
+          LedOn(GREEN0);
+          break;
+        }
+        /* The channel automatically closes if the search times out */
+        case EVENT_RX_SEARCH_TIMEOUT:
+        {
+          DebugPrintf("Search timeout\r\n");
+          break;
+        }
+        default:
+        {
+          LedOff(BLUE0);
+          LedOn(GREEN0);
+          DebugPrintf("Unexpected Event \r\n");
+          break;
+        }
+      }
+    }
+  }
+}
+
+static void UserApp1SM_WaitChannelClose(void)
+{
+  /* Has the channel been closed yet? */
+  if(AntRadioStatusChannel(ANT_CHANNEL_USERAPP) == ANT_CLOSED)
+  {
+    LedOff(GREEN0);
+    LedOn(BLUE0);
+    LedOn(RED0);
+
+    UserApp1_StateMachine = UserApp1SM_Idle;
+  }
+  /* Have we timed out yet? */
+  if( IsTimeUp(&UserApp1_u32Timeout, TIMEOUT_VALUE))
+  {
+    LedOff(GREEN0);
+    LedBlink(RED0, LED_4HZ);
+    UserApp1_StateMachine = UserApp1SM_Error;
+  }
+}
+
+/*
+static void interpretData(u8* au8DataContent)
+{
+  if(au8DataContent[0] == 0x90)
+  {
+    //
+  }
+  else if(au8DataContent[0] == 0x80)
+  {
+    //
+  }
+  else
+  {
+    //
+  }
+}
+*/
 static void antMasterTest(void)
 {
   static u8 au8TestMessage[] = {0, 0, 0, 0, 0xA5, 0, 0, 0};
