@@ -56,6 +56,7 @@ Constants / Definitions
 #define ANT_TX_POWER_USERAPP            RADIO_TX_POWER_4DBM   // Max tx power
 
 #define TIMEOUT_VALUE                   (u8)2000
+#define NUMBER_OF_POSSIBLE_NOTE_NUMBERS (u8)48
 
 /**********************************************************************************************************************
 Function Declarations

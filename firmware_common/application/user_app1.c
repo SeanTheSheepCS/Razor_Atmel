@@ -35,6 +35,7 @@ Runs current task state.  Should only be called once in main loop.
 **********************************************************************************************************************/
 
 #include "configuration.h"
+#include "music.h"
 
 /***********************************************************************************************************************
 Global variable definitions with scope across entire project.
@@ -42,7 +43,6 @@ All Global variable names shall start with "G_UserApp1"
 ***********************************************************************************************************************/
 /* New variables */
 volatile u32 G_u32UserApp1Flags;                       /* Global state flags */
-u8 u8volume = 76; /* The volume */
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Existing variables (defined in other files -- should all contain the "extern" keyword) */
@@ -67,6 +67,8 @@ static AntAssignChannelInfoType UserApp1_sChannelInfo = {0};
 static u8* UserApp1_au8MessageFail = "A failure has occurred, most likely with ant!\n";
 static u32 UserApp1_u32DataMsgCount = 0; /* ANT_DATA packets recieved */
 static u32 UserApp1_u32TickMsgCount = 0;
+static u8 UserApp1_au8NoteNumbers[] =   {0x48,0x49,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x90,0x91,0x92,0x93,0x94,0x95};
+static u16 UserApp1_au16Frequencies[] = {C3  ,C3S ,D3  ,D3S ,E3  ,F3  ,F3S ,G3  ,G3S ,A3  ,A3S ,B3  ,C4  ,C4S ,D4  ,D4S ,E4  ,F4  ,F4S ,G4  ,G4S ,A4  ,A4S ,B4  ,C5  ,C5S ,D5  ,D5S ,E5  ,F5  ,F5S ,G5  ,G5S ,A5  ,A5S ,B5  ,C6  ,C6S ,D6  ,D6S ,E6  ,F6  ,F6S ,G6  ,G6S ,A6  ,A6S ,B6  };
 
 /**********************************************************************************************************************
 Function Definitions
@@ -225,7 +227,8 @@ static void UserApp1SM_ChannelOpen(void)
 {
   static u8 u8LastState = 0xff;
   static u8 au8TickMessage[] = "EVENT x\n\r"; /* "x" at index [6] will be replaced by the current code */
-  static u8 au8DataContent[] = "xxxxxxxxxxxxxxxx";
+  static u8 au8DataContent[] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  static u8 au8DataContentForPrinting[] = "xxxxxxxxxxxxxxxx";
   static u8 au8LastAntData[ANT_APPLICATION_MESSAGE_BYTES] = {0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF,0xFF};
   static u8 au8TestMessage[] = {0,0,0,0,0xA5,0,0,0};
   bool bGotNewData;
@@ -276,17 +279,16 @@ static void UserApp1SM_ChannelOpen(void)
         {
           bGotNewData = TRUE;
           au8LastAntData[i] = G_au8AntApiCurrentMessageBytes[i];
-          au8DataContent[2*i] = HexToASCIICharUpper(G_au8AntApiCurrentMessageBytes[i] / 16); // ORIGINAL : ...CurrentData[i]
-          au8DataContent[2*i+1] = HexToASCIICharUpper(G_au8AntApiCurrentMessageBytes[i] % 16); // ORIGINAL: ...CurrentData[i]
+          au8DataContent[i] = G_au8AntApiCurrentMessageBytes[i];
+          au8DataContentForPrinting[2*i] = HexToASCIICharUpper(G_au8AntApiCurrentMessageBytes[i] / 16); // ORIGINAL : ...CurrentData[i]
+          au8DataContentForPrinting[2*i+1] = HexToASCIICharUpper(G_au8AntApiCurrentMessageBytes[i] % 16); // ORIGINAL: ...CurrentData[i]
         }
       }
-      if(bGotNewData)
-      {
-        /* Print the new data */
-        DebugPrintf(au8DataContent);
-        interpretData(au8DataContent);
-        DebugLineFeed();
-      }
+      /* Print the new data */
+      DebugPrintf(au8DataContentForPrinting);
+      interpretData(au8DataContent);
+      DebugLineFeed();
+
     }
     else if(G_eAntApiCurrentMessageClass == ANT_TICK) /* Is this a tick message? */
     {
@@ -357,11 +359,30 @@ static void interpretData(u8* au8DataContent)
 {
   if(au8DataContent[0] == 0x90)
   {
-    //
+    u8 nodeNumber = au8DataContent[1];
+    u16 frequency = 0;
+    for(u8 i = 0; i < NUMBER_OF_POSSIBLE_NOTE_NUMBERS; i++)
+    {
+      if(nodeNumber == UserApp1_au8NoteNumbers[i])
+      {
+        frequency = UserApp1_au16Frequencies[i];
+        break;
+      }
+    }
+    if(frequency == 0)
+    {
+      //This note is too low to be represented with our current set of frequencies!
+      DebugPrintf("The entered note was outside our frequency range. Consider putting implementation into the C# program to shift the song one octave up if the song has notes like this.");
+    }
+    else
+    {
+      PWMAudioSetFrequency(BUZZER1,frequency);
+      PWMAudioOn(BUZZER1);
+    }
   }
   else if(au8DataContent[0] == 0x80)
   {
-    //
+    PWMAudioOff(BUZZER1); //Assumes only one note was being played at one time!
   }
   else
   {
