@@ -69,13 +69,8 @@ Function Declarations
 static void antMasterTest(void);
 
 static void interpretData(u8* au8dataContent);
-static void renderBar(void);
-static void unRenderBar(void);
-static void manageVolumeBar(void);
-static void manageBottomButtons(void);
-static void renderHomeButtonNineByNine(u16 row, u16 col, bool shouldInvert);
-static void renderBackButtonNineByNine(u16 row, u16 col, bool shouldInvert);
-static void invertButtonBitMapNineByNine(u8* u8pMap, u8 u8rows, u8 u8cols);
+static void printLetterOnScreen(u8 letter);
+static void clearLetters(void);
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Protected functions                                                                                                */

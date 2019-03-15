@@ -67,7 +67,10 @@ static AntAssignChannelInfoType UserApp1_sChannelInfo = {0};
 static u8* UserApp1_au8MessageFail = "A failure has occurred, most likely with ant!\n";
 static u32 UserApp1_u32DataMsgCount = 0; /* ANT_DATA packets recieved */
 static u32 UserApp1_u32TickMsgCount = 0;
-static u8 UserApp1_au8NoteNumbers[] =   {0x48,0x49,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x90,0x91,0x92,0x93,0x94,0x95};
+
+static u8 lastInstruction;
+static u8 charsOnScreen;
+static u8 UserApp1_au8NoteNumbers[] =   {48  ,49  ,50  ,51  ,52  ,53  ,54  ,55  ,56  ,57  ,58  ,59  ,60  ,61  ,62  ,63  ,64  ,65  ,66  ,67  ,68  ,69  ,70  ,71  ,72  ,73  ,74  ,75  ,76  ,77  ,78  ,79  ,80  ,81  ,82  ,83  ,84  ,85  ,86  ,87  ,88  ,89  ,90  ,91  ,92  ,93  ,94  ,95  };
 static u16 UserApp1_au16Frequencies[] = {C3  ,C3S ,D3  ,D3S ,E3  ,F3  ,F3S ,G3  ,G3S ,A3  ,A3S ,B3  ,C4  ,C4S ,D4  ,D4S ,E4  ,F4  ,F4S ,G4  ,G4S ,A4  ,A4S ,B4  ,C5  ,C5S ,D5  ,D5S ,E5  ,F5  ,F5S ,G5  ,G5S ,A5  ,A5S ,B5  ,C6  ,C6S ,D6  ,D6S ,E6  ,F6  ,F6S ,G6  ,G6S ,A6  ,A6S ,B6  };
 
 /**********************************************************************************************************************
@@ -248,6 +251,7 @@ static void UserApp1SM_ChannelOpen(void)
 
     /* Changes state and sets the timer */
     UserApp1_u32Timeout = G_u32SystemTime1ms;
+    PWMAudioOff(BUZZER1);
     UserApp1_StateMachine = UserApp1SM_WaitChannelClose;
   }
 
@@ -357,39 +361,180 @@ static void UserApp1SM_WaitChannelClose(void)
 
 static void interpretData(u8* au8DataContent)
 {
-  if(au8DataContent[0] == 0x90)
+  static bool taskInProgress = FALSE;
+  static u8 bytesLeftInMessage = 0;
+  if(taskInProgress)
   {
-    u8 nodeNumber = au8DataContent[1];
-    u16 frequency = 0;
-    for(u8 i = 0; i < NUMBER_OF_POSSIBLE_NOTE_NUMBERS; i++)
+    if(lastInstruction == 0x03) //Track name
     {
-      if(nodeNumber == UserApp1_au8NoteNumbers[i])
+      DebugPrintf("GETS HERE!");
+      int i = 0;
+      while(bytesLeftInMessage != 0 && i <= 7)
       {
-        frequency = UserApp1_au16Frequencies[i];
-        break;
+        printLetterOnScreen(au8DataContent[i]);
+        bytesLeftInMessage--;
+        i++;
+      }
+      if(bytesLeftInMessage!=0)
+      {
+        taskInProgress = TRUE;
+        lastInstruction = 0x03;
+      }
+      else
+      {
+        taskInProgress = FALSE;
       }
     }
-    if(frequency == 0)
-    {
-      //This note is too low to be represented with our current set of frequencies!
-      DebugPrintf("The entered note was outside our frequency range. Consider putting implementation into the C# program to shift the song one octave up if the song has notes like this.");
-    }
-    else
-    {
-      PWMAudioSetFrequency(BUZZER1,frequency);
-      PWMAudioOn(BUZZER1);
-    }
-  }
-  else if(au8DataContent[0] == 0x80)
-  {
-    PWMAudioOff(BUZZER1); //Assumes only one note was being played at one time!
   }
   else
   {
-    //
+    if((au8DataContent[0] & 0xf0) == 0x90)
+    {
+      u8 nodeNumber = au8DataContent[1];
+      u16 frequency = 0;
+      for(u8 i = 0; i < NUMBER_OF_POSSIBLE_NOTE_NUMBERS; i++)
+      {
+        if(nodeNumber == UserApp1_au8NoteNumbers[i])
+        {
+          frequency = UserApp1_au16Frequencies[i];
+          break;
+        }
+      }
+      if(frequency == 0)
+      {
+        //This note is too low to be represented with our current set of frequencies!
+        DebugPrintf("The entered note was outside our frequency range. Consider putting implementation into the C# program to shift the song one octave up if the song has notes like this.");
+      }
+      else
+      {
+        PWMAudioSetFrequency(BUZZER1,frequency);
+        PWMAudioOn(BUZZER1);
+      }
+    }
+    else if((au8DataContent[0] & 0xf0) == 0x80)
+    {
+      PWMAudioOff(BUZZER1); //Assumes only one note was being played at one time!
+    }
+    else if(au8DataContent[0] == 0xFF)
+    {
+      //This is a meta event
+      if(au8DataContent[1] == 0x03)
+      {
+        bytesLeftInMessage = au8DataContent[2];
+        int i = 3;
+        clearLetters();
+        while(bytesLeftInMessage != 0 && i <= 7)
+        {
+          printLetterOnScreen(au8DataContent[i]);
+          bytesLeftInMessage--;
+          i++;
+        }
+        if(bytesLeftInMessage!=0)
+        {
+          taskInProgress = TRUE;
+          lastInstruction = 0x03;
+        }
+      }
+      else
+      {
+        DebugPrintf("Unrecognized meta event.");
+      }
+    }
+    else
+    {
+      DebugPrintf("Unrecognized command");
+    }
   }
 }
 
+static void clearLetters(void)
+{
+  //Do nothing;
+  return;
+}
+
+static void printLetterOnScreen(u8 u8Letter)
+{
+  static u8 u8letterE[7][1] = {{0x1F},{0x01},{0x01},{0x0F},{0x01},{0x01},{0x1F}};
+  static u8 u8letterL[7][1] = {{0x01},{0x01},{0x01},{0x01},{0x01},{0x01},{0x1F}};
+  static u8 u8letterC[7][1] = {{0x0E},{0x11},{0x01},{0x01},{0x01},{0x11},{0x1E}};
+  static u8 u8letterT[7][1] = {{0x1F},{0x04},{0x04},{0x04},{0x04},{0x04},{0x04}};
+  static u8 u8letterR[7][1] = {{0x0F},{0x11},{0x11},{0x0F},{0x05},{0x09},{0x11}};
+  static u8 u8letterI[7][1] = {{0x1F},{0x04},{0x04},{0x04},{0x04},{0x04},{0x1F}};
+  static u8 u8letterP[7][1] = {{0x0F},{0x11},{0x11},{0x0F},{0x01},{0x01},{0x01}};
+  static u8 u8letterA[7][1] = {{0x0E},{0x11},{0x11},{0x1F},{0x11},{0x11},{0x11}};
+  static u8 u8letterN[7][1] = {{0x11},{0x11},{0x13},{0x15},{0x19},{0x11},{0x11}};
+  static u8 u8letterO[7][1] = {{0x0E},{0x11},{0x11},{0x11},{0x11},{0x11},{0x0E}};
+  static u8 u8letterM[7][1] = {{0x11},{0x1B},{0x15},{0x15},{0x11},{0x11},{0x11}};
+  static u8 u8letterJ[7][1] = {{0x1C},{0x08},{0x08},{0x08},{0x08},{0x09},{0x06}};
+  static u8 u8letterD[7][1] = {{0x07},{0x09},{0x11},{0x11},{0x11},{0x09},{0x07}};
+  static u8 u8letterG[7][1] = {{0x0E},{0x11},{0x01},{0x1D},{0x11},{0x11},{0x0E}};
+  static u8 u8letterSpace[7][1] = {{0x00},{0x00},{0x00},{0x00},{0x00},{0x00},{0x00}};
+
+  const u8* u8pAddress;
+  bool noLetterAssignmentMade = FALSE;
+  if(65 <= u8Letter && u8Letter <= 90) //Looks for uppercases
+  {
+    u8Letter = u8Letter + 32;
+  }
+  switch(u8Letter)
+  {
+  case 'a':
+    u8pAddress = &(u8letterA[0][0]);
+    break;
+  case 'c':
+    u8pAddress = &(u8letterC[0][0]);
+    break;
+  case 'd':
+    u8pAddress = &(u8letterD[0][0]);
+    break;
+  case 'e':
+    u8pAddress = &(u8letterE[0][0]);
+    break;
+  case 'g':
+    u8pAddress = &(u8letterG[0][0]);
+    break;
+  case 'i':
+    u8pAddress = &(u8letterI[0][0]);
+    break;
+  case 'j':
+    u8pAddress = &(u8letterJ[0][0]);
+    break;
+  case 'l':
+    u8pAddress = &(u8letterL[0][0]);
+    break;
+  case 'm':
+    u8pAddress = &(u8letterM[0][0]);
+    break;
+  case 'n':
+    u8pAddress = &(u8letterN[0][0]);
+    break;
+  case 'o':
+    u8pAddress = &(u8letterO[0][0]);
+    break;
+  case 'p':
+    u8pAddress = &(u8letterP[0][0]);
+    break;
+  case 'r':
+    u8pAddress = &(u8letterR[0][0]);
+    break;
+  case 't':
+    u8pAddress = &(u8letterT[0][0]);
+    break;
+  case ' ':
+    u8pAddress = &(u8letterSpace[0][0]);
+    break;
+  default:
+    noLetterAssignmentMade = TRUE;
+    break;
+  }
+  if(!noLetterAssignmentMade)
+  {
+    PixelBlockType PBTbarInfo = {0,(charsOnScreen*8),7, (1*8)};
+    LcdLoadBitmap(u8pAddress,&PBTbarInfo);
+    charsOnScreen++;
+  }
+}
 static void UserApp1SM_Error(void)
 {
 
