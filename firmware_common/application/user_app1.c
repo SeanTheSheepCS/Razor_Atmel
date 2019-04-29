@@ -435,6 +435,11 @@ static void interpretData(u8* au8DataContent)
           lastInstruction = 0x03;
         }
       }
+      else if(au8DataContent[1] ==  0x2F)
+      {
+        //End of track
+        clearLetters();
+      }
       else
       {
         DebugPrintf("Unrecognized meta event.");
@@ -449,26 +454,49 @@ static void interpretData(u8* au8DataContent)
 
 static void clearLetters(void)
 {
-  //Do nothing;
-  return;
+  LcdClearScreen();
+  charsOnScreen = 0;
+  /*
+  static u8 u8letterSpace[7][1] = {{0x1F},{0x01},{0x01},{0x0F},{0x01},{0x01},{0x1F}};
+  const u8* u8pAddress = &(u8letterSpace[0][0]);
+  u8 i = 11;
+  while(i != 0)
+  {
+    PixelBlockType PBTbarInfo = {0,(i*8),7, (1*8)};
+    LcdLoadBitmap(u8pAddress,&PBTbarInfo);
+    i--;
+  }
+  */
 }
 
 static void printLetterOnScreen(u8 u8Letter)
 {
-  static u8 u8letterE[7][1] = {{0x1F},{0x01},{0x01},{0x0F},{0x01},{0x01},{0x1F}};
-  static u8 u8letterL[7][1] = {{0x01},{0x01},{0x01},{0x01},{0x01},{0x01},{0x1F}};
-  static u8 u8letterC[7][1] = {{0x0E},{0x11},{0x01},{0x01},{0x01},{0x11},{0x1E}};
-  static u8 u8letterT[7][1] = {{0x1F},{0x04},{0x04},{0x04},{0x04},{0x04},{0x04}};
-  static u8 u8letterR[7][1] = {{0x0F},{0x11},{0x11},{0x0F},{0x05},{0x09},{0x11}};
-  static u8 u8letterI[7][1] = {{0x1F},{0x04},{0x04},{0x04},{0x04},{0x04},{0x1F}};
-  static u8 u8letterP[7][1] = {{0x0F},{0x11},{0x11},{0x0F},{0x01},{0x01},{0x01}};
   static u8 u8letterA[7][1] = {{0x0E},{0x11},{0x11},{0x1F},{0x11},{0x11},{0x11}};
+  static u8 u8letterB[7][1] = {{0x0F},{0x11},{0x11},{0x0F},{0x11},{0x11},{0x0F}};
+  static u8 u8letterC[7][1] = {{0x0E},{0x11},{0x01},{0x01},{0x01},{0x11},{0x1E}};
+  static u8 u8letterD[7][1] = {{0x07},{0x09},{0x11},{0x11},{0x11},{0x09},{0x07}};
+  static u8 u8letterE[7][1] = {{0x1F},{0x01},{0x01},{0x0F},{0x01},{0x01},{0x1F}};
+  static u8 u8letterF[7][1] = {{0x1F},{0x01},{0x01},{0x0F},{0x01},{0x01},{0x01}};
+  static u8 u8letterG[7][1] = {{0x0E},{0x11},{0x01},{0x1D},{0x11},{0x11},{0x0E}};
+  static u8 u8letterH[7][1] = {{0x11},{0x11},{0x11},{0x1F},{0x11},{0x11},{0x11}};
+  static u8 u8letterI[7][1] = {{0x1F},{0x04},{0x04},{0x04},{0x04},{0x04},{0x1F}};
+  static u8 u8letterJ[7][1] = {{0x1C},{0x08},{0x08},{0x08},{0x08},{0x09},{0x06}};
+  static u8 u8letterK[7][1] = {{0x11},{0x09},{0x05},{0x03},{0x05},{0x09},{0x11}};
+  static u8 u8letterL[7][1] = {{0x01},{0x01},{0x01},{0x01},{0x01},{0x01},{0x1F}};
+  static u8 u8letterM[7][1] = {{0x11},{0x1B},{0x15},{0x15},{0x11},{0x11},{0x11}};
   static u8 u8letterN[7][1] = {{0x11},{0x11},{0x13},{0x15},{0x19},{0x11},{0x11}};
   static u8 u8letterO[7][1] = {{0x0E},{0x11},{0x11},{0x11},{0x11},{0x11},{0x0E}};
-  static u8 u8letterM[7][1] = {{0x11},{0x1B},{0x15},{0x15},{0x11},{0x11},{0x11}};
-  static u8 u8letterJ[7][1] = {{0x1C},{0x08},{0x08},{0x08},{0x08},{0x09},{0x06}};
-  static u8 u8letterD[7][1] = {{0x07},{0x09},{0x11},{0x11},{0x11},{0x09},{0x07}};
-  static u8 u8letterG[7][1] = {{0x0E},{0x11},{0x01},{0x1D},{0x11},{0x11},{0x0E}};
+  static u8 u8letterP[7][1] = {{0x0F},{0x11},{0x11},{0x0F},{0x01},{0x01},{0x01}};
+  static u8 u8letterQ[7][1] = {{0x0E},{0x11},{0x11},{0x11},{0x15},{0x09},{0x16}};
+  static u8 u8letterR[7][1] = {{0x0F},{0x11},{0x11},{0x0F},{0x05},{0x09},{0x11}};
+  static u8 u8letterS[7][1] = {{0x1E},{0x01},{0x01},{0x0E},{0x10},{0x10},{0x0F}};
+  static u8 u8letterT[7][1] = {{0x1F},{0x04},{0x04},{0x04},{0x04},{0x04},{0x04}};
+  static u8 u8letterU[7][1] = {{0x11},{0x11},{0x11},{0x11},{0x11},{0x11},{0x0E}};
+  static u8 u8letterV[7][1] = {{0x11},{0x11},{0x11},{0x11},{0x11},{0x0A},{0x04}};
+  static u8 u8letterW[7][1] = {{0x11},{0x11},{0x11},{0x11},{0x15},{0x15},{0x0E}};
+  static u8 u8letterX[7][1] = {{0x11},{0x11},{0x0A},{0x04},{0x0A},{0x11},{0x11}};
+  static u8 u8letterY[7][1] = {{0x11},{0x11},{0x11},{0x0A},{0x04},{0x04},{0x04}};
+  static u8 u8letterZ[7][1] = {{0x1F},{0x10},{0x08},{0x04},{0x02},{0x01},{0x1F}};
   static u8 u8letterSpace[7][1] = {{0x00},{0x00},{0x00},{0x00},{0x00},{0x00},{0x00}};
 
   const u8* u8pAddress;
@@ -482,6 +510,9 @@ static void printLetterOnScreen(u8 u8Letter)
   case 'a':
     u8pAddress = &(u8letterA[0][0]);
     break;
+  case 'b':
+    u8pAddress = &(u8letterB[0][0]);
+    break;
   case 'c':
     u8pAddress = &(u8letterC[0][0]);
     break;
@@ -491,14 +522,23 @@ static void printLetterOnScreen(u8 u8Letter)
   case 'e':
     u8pAddress = &(u8letterE[0][0]);
     break;
+  case 'f':
+    u8pAddress = &(u8letterF[0][0]);
+    break;
   case 'g':
     u8pAddress = &(u8letterG[0][0]);
+    break;
+  case 'h':
+    u8pAddress = &(u8letterH[0][0]);
     break;
   case 'i':
     u8pAddress = &(u8letterI[0][0]);
     break;
   case 'j':
     u8pAddress = &(u8letterJ[0][0]);
+    break;
+  case 'k':
+    u8pAddress = &(u8letterK[0][0]);
     break;
   case 'l':
     u8pAddress = &(u8letterL[0][0]);
@@ -515,11 +555,35 @@ static void printLetterOnScreen(u8 u8Letter)
   case 'p':
     u8pAddress = &(u8letterP[0][0]);
     break;
+  case 'q':
+    u8pAddress = &(u8letterQ[0][0]);
+    break;
   case 'r':
     u8pAddress = &(u8letterR[0][0]);
     break;
+  case 's':
+    u8pAddress = &(u8letterS[0][0]);
+    break;
   case 't':
     u8pAddress = &(u8letterT[0][0]);
+    break;
+  case 'u':
+    u8pAddress = &(u8letterU[0][0]);
+    break;
+  case 'v':
+    u8pAddress = &(u8letterV[0][0]);
+    break;
+  case 'w':
+    u8pAddress = &(u8letterW[0][0]);
+    break;
+  case 'x':
+    u8pAddress = &(u8letterX[0][0]);
+    break;
+  case 'y':
+    u8pAddress = &(u8letterY[0][0]);
+    break;
+  case 'z':
+    u8pAddress = &(u8letterZ[0][0]);
     break;
   case ' ':
     u8pAddress = &(u8letterSpace[0][0]);
