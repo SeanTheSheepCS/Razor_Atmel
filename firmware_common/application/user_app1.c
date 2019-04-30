@@ -497,93 +497,193 @@ static void printLetterOnScreen(u8 u8Letter)
   static u8 u8letterX[7][1] = {{0x11},{0x11},{0x0A},{0x04},{0x0A},{0x11},{0x11}};
   static u8 u8letterY[7][1] = {{0x11},{0x11},{0x11},{0x0A},{0x04},{0x04},{0x04}};
   static u8 u8letterZ[7][1] = {{0x1F},{0x10},{0x08},{0x04},{0x02},{0x01},{0x1F}};
+  static u8 u8letterLowercaseA[7][1] = {{0x00},{0x00},{0x0E},{0x10},{0x1E},{0x11},{0x1E}};
+  static u8 u8letterLowercaseB[7][1] = {{0x01},{0x01},{0x0F},{0x11},{0x11},{0x11},{0x0F}};
+  static u8 u8letterLowercaseC[7][1] = {{0x00},{0x00},{0x0E},{0x01},{0x01},{0x11},{0x0E}};
+  static u8 u8letterLowercaseD[7][1] = {{0x10},{0x10},{0x16},{0x19},{0x11},{0x11},{0x1E}};
+  static u8 u8letterLowercaseE[7][1] = {{0x00},{0x00},{0x0E},{0x11},{0x1F},{0x01},{0x0E}};
+  static u8 u8letterLowercaseF[7][1] = {{0x0C},{0x12},{0x02},{0x07},{0x02},{0x02},{0x02}};
+  static u8 u8letterLowercaseG[7][1] = {{0x00},{0x1E},{0x11},{0x11},{0x1E},{0x10},{0x0E}};
+  static u8 u8letterLowercaseH[7][1] = {{0x01},{0x01},{0x0D},{0x13},{0x11},{0x11},{0x11}};
+  static u8 u8letterLowercaseI[7][1] = {{0x04},{0x00},{0x06},{0x04},{0x04},{0x04},{0x0E}};
+  static u8 u8letterLowercaseJ[7][1] = {{0x08},{0x00},{0x0C},{0x08},{0x08},{0x09},{0x06}};
+  static u8 u8letterLowercaseK[7][1] = {{0x01},{0x01},{0x09},{0x05},{0x03},{0x05},{0x09}};
+  static u8 u8letterLowercaseL[7][1] = {{0x06},{0x04},{0x04},{0x04},{0x04},{0x04},{0x0E}};
+  static u8 u8letterLowercaseM[7][1] = {{0x00},{0x00},{0x0B},{0x15},{0x15},{0x11},{0x11}};
+  static u8 u8letterLowercaseN[7][1] = {{0x00},{0x00},{0x0D},{0x13},{0x11},{0x11},{0x11}};
+  static u8 u8letterLowercaseO[7][1] = {{0x00},{0x00},{0x0E},{0x11},{0x11},{0x11},{0x1E}};
+  static u8 u8letterLowercaseP[7][1] = {{0x00},{0x00},{0x0F},{0x11},{0x0F},{0x01},{0x01}};
+  static u8 u8letterLowercaseQ[7][1] = {{0x00},{0x00},{0x16},{0x19},{0x1E},{0x10},{0x10}};
+  static u8 u8letterLowercaseR[7][1] = {{0x00},{0x00},{0x0D},{0x13},{0x01},{0x01},{0x01}};
+  static u8 u8letterLowercaseS[7][1] = {{0x00},{0x00},{0x0E},{0x01},{0x0E},{0x10},{0x0F}};
+  static u8 u8letterLowercaseT[7][1] = {{0x02},{0x02},{0x07},{0x02},{0x02},{0x12},{0x0C}};
+  static u8 u8letterLowercaseU[7][1] = {{0x00},{0x00},{0x11},{0x11},{0x11},{0x19},{0x16}};
+  static u8 u8letterLowercaseV[7][1] = {{0x00},{0x00},{0x11},{0x11},{0x11},{0x0A},{0x04}};
+  static u8 u8letterLowercaseW[7][1] = {{0x00},{0x00},{0x11},{0x11},{0x11},{0x15},{0x0A}};
+  static u8 u8letterLowercaseX[7][1] = {{0x00},{0x00},{0x11},{0x0A},{0x04},{0x0A},{0x11}};
+  static u8 u8letterLowercaseY[7][1] = {{0x00},{0x00},{0x11},{0x11},{0x1E},{0x10},{0x0E}};
+  static u8 u8letterLowercaseZ[7][1] = {{0x00},{0x00},{0x1F},{0x08},{0x04},{0x02},{0x1F}};
   static u8 u8letterSpace[7][1] = {{0x00},{0x00},{0x00},{0x00},{0x00},{0x00},{0x00}};
 
   const u8* u8pAddress;
   bool noLetterAssignmentMade = FALSE;
-  if(65 <= u8Letter && u8Letter <= 90) //Looks for uppercases
-  {
-    u8Letter = u8Letter + 32;
-  }
   switch(u8Letter)
   {
-  case 'a':
+  case 'A':
     u8pAddress = &(u8letterA[0][0]);
     break;
-  case 'b':
+  case 'B':
     u8pAddress = &(u8letterB[0][0]);
     break;
-  case 'c':
+  case 'C':
     u8pAddress = &(u8letterC[0][0]);
     break;
-  case 'd':
+  case 'D':
     u8pAddress = &(u8letterD[0][0]);
     break;
-  case 'e':
+  case 'E':
     u8pAddress = &(u8letterE[0][0]);
     break;
-  case 'f':
+  case 'F':
     u8pAddress = &(u8letterF[0][0]);
     break;
-  case 'g':
+  case 'G':
     u8pAddress = &(u8letterG[0][0]);
     break;
-  case 'h':
+  case 'H':
     u8pAddress = &(u8letterH[0][0]);
     break;
-  case 'i':
+  case 'I':
     u8pAddress = &(u8letterI[0][0]);
     break;
-  case 'j':
+  case 'J':
     u8pAddress = &(u8letterJ[0][0]);
     break;
-  case 'k':
+  case 'K':
     u8pAddress = &(u8letterK[0][0]);
     break;
-  case 'l':
+  case 'L':
     u8pAddress = &(u8letterL[0][0]);
     break;
-  case 'm':
+  case 'M':
     u8pAddress = &(u8letterM[0][0]);
     break;
-  case 'n':
+  case 'N':
     u8pAddress = &(u8letterN[0][0]);
     break;
-  case 'o':
+  case 'O':
     u8pAddress = &(u8letterO[0][0]);
     break;
-  case 'p':
+  case 'P':
     u8pAddress = &(u8letterP[0][0]);
     break;
-  case 'q':
+  case 'Q':
     u8pAddress = &(u8letterQ[0][0]);
     break;
-  case 'r':
+  case 'R':
     u8pAddress = &(u8letterR[0][0]);
     break;
-  case 's':
+  case 'S':
     u8pAddress = &(u8letterS[0][0]);
     break;
-  case 't':
+  case 'T':
     u8pAddress = &(u8letterT[0][0]);
     break;
-  case 'u':
+  case 'U':
     u8pAddress = &(u8letterU[0][0]);
     break;
-  case 'v':
+  case 'V':
     u8pAddress = &(u8letterV[0][0]);
     break;
-  case 'w':
+  case 'W':
     u8pAddress = &(u8letterW[0][0]);
     break;
-  case 'x':
+  case 'X':
     u8pAddress = &(u8letterX[0][0]);
     break;
-  case 'y':
+  case 'Y':
     u8pAddress = &(u8letterY[0][0]);
     break;
-  case 'z':
+  case 'Z':
     u8pAddress = &(u8letterZ[0][0]);
+    break;
+  case 'a':
+    u8pAddress = &(u8letterLowercaseA[0][0]);
+    break;
+  case 'b':
+    u8pAddress = &(u8letterLowercaseB[0][0]);
+    break;
+  case 'c':
+    u8pAddress = &(u8letterLowercaseC[0][0]);
+    break;
+  case 'd':
+    u8pAddress = &(u8letterLowercaseD[0][0]);
+    break;
+  case 'e':
+    u8pAddress = &(u8letterLowercaseE[0][0]);
+    break;
+  case 'f':
+    u8pAddress = &(u8letterLowercaseF[0][0]);
+    break;
+  case 'g':
+    u8pAddress = &(u8letterLowercaseG[0][0]);
+    break;
+  case 'h':
+    u8pAddress = &(u8letterLowercaseH[0][0]);
+    break;
+  case 'i':
+    u8pAddress = &(u8letterLowercaseI[0][0]);
+    break;
+  case 'j':
+    u8pAddress = &(u8letterLowercaseJ[0][0]);
+    break;
+  case 'k':
+    u8pAddress = &(u8letterLowercaseK[0][0]);
+    break;
+  case 'l':
+    u8pAddress = &(u8letterLowercaseL[0][0]);
+    break;
+  case 'm':
+    u8pAddress = &(u8letterLowercaseM[0][0]);
+    break;
+  case 'n':
+    u8pAddress = &(u8letterLowercaseN[0][0]);
+    break;
+  case 'o':
+    u8pAddress = &(u8letterLowercaseO[0][0]);
+    break;
+  case 'p':
+    u8pAddress = &(u8letterLowercaseP[0][0]);
+    break;
+  case 'q':
+    u8pAddress = &(u8letterLowercaseQ[0][0]);
+    break;
+  case 'r':
+    u8pAddress = &(u8letterLowercaseR[0][0]);
+    break;
+  case 's':
+    u8pAddress = &(u8letterLowercaseS[0][0]);
+    break;
+  case 't':
+    u8pAddress = &(u8letterLowercaseT[0][0]);
+    break;
+  case 'u':
+    u8pAddress = &(u8letterLowercaseU[0][0]);
+    break;
+  case 'v':
+    u8pAddress = &(u8letterLowercaseV[0][0]);
+    break;
+  case 'w':
+    u8pAddress = &(u8letterLowercaseW[0][0]);
+    break;
+  case 'x':
+    u8pAddress = &(u8letterLowercaseX[0][0]);
+    break;
+  case 'y':
+    u8pAddress = &(u8letterLowercaseY[0][0]);
+    break;
+  case 'z':
+    u8pAddress = &(u8letterLowercaseZ[0][0]);
     break;
   case ' ':
     u8pAddress = &(u8letterSpace[0][0]);
