@@ -93,6 +93,8 @@ void UserApp1Initialize(void)
   /* If good initialization, set state to Idle */
   if( 1 )
   {
+    LCDCommand(LCD_CLEAR_CMD);
+    LCDMessage(LINE1_START_ADDR, "0000000000");
     UserApp1_StateMachine = UserApp1SM_Idle;
   }
   else
@@ -121,9 +123,6 @@ Promises:
 void UserApp1RunActiveState(void)
 {
   UserApp1_StateMachine();
-  
-  //Make the LED blink 
-  
 } /* end UserApp1RunActiveState */
 
 
@@ -140,72 +139,63 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  static u32 u32Counter = 0;
-  static u32 u32alternatingColoursCounter = 0;
-  static bool bLightIsOn = FALSE;
-  static bool hasReachedLED0 = FALSE;
-  static bool hasReachedLED1 = FALSE;
-  static bool hasReachedLED2 = FALSE;
-  static bool hasReachedLED3 = FALSE;
-  //Increment counter every millisecond
-  u32Counter++;
-  
-  /*
-  if(u32Counter == COUNTER_LIMIT_MS)
+  static u8 u8charsOnScreen = 10;
+  static u8 au8currentNumber[] = "0000000000";
+
+  if(WasButtonPressed(BUTTON0))
   {
-    //If COUNTER_LIMIT_MS milliseconds have passed reset the counter and switch the state of the LED.
-    u32Counter = 0;
-    if(bLightIsOn)
+    PWMAudioOff(BUZZER1);
+    for(u8 i = u8charsOnScreen-1; i >= 0; i--)
     {
-      HEARTBEAT_OFF();
+      if(au8currentNumber[i] == '0')
+      {
+        au8currentNumber[i] = '1';
+        LCDClearChars(LINE1_START_ADDR, 10);
+        LCDMessage(LINE1_START_ADDR, au8currentNumber);
+        break;
+      }
+      else
+      {
+        au8currentNumber[i] = '0';
+      }
+      
+      if(i == 0)
+      {
+        PWMAudioSetFrequency(BUZZER1, 500);
+        for( u8 j = 0; j < u8charsOnScreen; j++)
+        {
+          au8currentNumber[j] = '1';
+        }
+        PWMAudioOn(BUZZER1);
+      }
     }
-    else
-    {
-      HEARTBEAT_ON();
-    }
-    bLightIsOn = !bLightIsOn;
-  } 
-  */
- 
-  u32alternatingColoursCounter++;
-  if((u32alternatingColoursCounter > ALTERNATING_COLOUR_LIMIT_MS)&&(!hasReachedLED0))
-  {
-    //If 0.5 seconds have passed, turn on the leftmost LED
-    LedPWM(GREEN0, LED_PWM_35);
-    hasReachedLED0 = TRUE;
-  }
-  if(u32alternatingColoursCounter > 2*ALTERNATING_COLOUR_LIMIT_MS&&(!hasReachedLED1))
-  {
-    //If 1 second has passed, turn on the next LED
-    LedPWM(RED1, LED_PWM_35);
-    hasReachedLED1 = TRUE;
-  }
-  if(u32alternatingColoursCounter > 3*ALTERNATING_COLOUR_LIMIT_MS&&(!hasReachedLED2))
-  {
-    //If 1.5 seconds have passed, turn on the next LED
-    LedPWM(GREEN2, LED_PWM_35);
-    hasReachedLED2 = TRUE;
-  }
-  if(u32alternatingColoursCounter > 4*ALTERNATING_COLOUR_LIMIT_MS&&(!hasReachedLED3))
-  {
-    //If 2 seconds have passed, turn on the last LED
-    LedPWM(RED3, LED_PWM_35);
-    hasReachedLED3 = TRUE;
-  }
-  if(u32alternatingColoursCounter > 5*ALTERNATING_COLOUR_LIMIT_MS)
-  {
-    //If 2.5 seconds have passed, turn off all the LEDs
-    u32alternatingColoursCounter = 0;
-    LedOff(GREEN0);
-    LedOff(RED1);
-    LedOff(GREEN2);
-    LedOff(RED3);
-    hasReachedLED0 = FALSE;
-    hasReachedLED1 = FALSE;
-    hasReachedLED2 = FALSE;
-    hasReachedLED3 = FALSE;
+    ButtonAcknowledge(BUTTON0);
   }
   
+  if(WasButtonPressed(BUTTON1))
+  {
+    PWMAudioOff(BUZZER1);
+    for(u8 i = u8charsOnScreen-1; i >= 0; i--)
+    {
+      if(au8currentNumber[i] == '1')
+      {
+        au8currentNumber[i] = '0';
+        for(u8 j = i+1; j < u8charsOnScreen; j++)
+        {
+          au8currentNumber[j] = '1';
+        }
+        LCDClearChars(LINE1_START_ADDR, 10);
+        LCDMessage(LINE1_START_ADDR, au8currentNumber);
+        break;
+      }
+      if( i == 0)
+      {
+        PWMAudioSetFrequency(BUZZER1, 500);
+        PWMAudioOn(BUZZER1);
+      }
+    }
+    ButtonAcknowledge(BUZZER1);
+  }
 } /* end UserApp1SM_Idle() */
     
 
