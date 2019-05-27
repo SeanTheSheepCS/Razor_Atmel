@@ -140,7 +140,26 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  DebugPrintf("HI");
+  static u32 u32Counter = 0;
+  static bool isLightOn = FALSE;
   
+  
+  if(u32Counter >= COUNTER_LIMIT_MS)
+  {
+    if(isLightOn)
+    {
+      LedOff(BLUE1);
+      isLightOn = FALSE;
+    }
+    else
+    {
+      LedOn(BLUE1);
+      isLightOn = TRUE;
+    }
+    u32Counter = 0;
+  }
+  u32Counter++;
 } /* end UserApp1SM_Idle() */
     
 
@@ -148,7 +167,7 @@ static void UserApp1SM_Idle(void)
 /* Handle an error */
 static void UserApp1SM_Error(void)          
 {
-  
+  DebugPrintf("ERROR STATE");
 } /* end UserApp1SM_Error() */
 
 
