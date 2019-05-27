@@ -53,7 +53,7 @@ extern volatile u32 G_u32SystemTime1ms;                   /*!< @brief From main.
 extern volatile u32 G_u32SystemTime1s;                    /*!< @brief From main.c */
 extern volatile u32 G_u32SystemFlags;                     /*!< @brief From main.c */
 extern volatile u32 G_u32ApplicationFlags;                /*!< @brief From main.c */
-
+extern volatile u32 G_u32Spi0ApplicationFlags;            /*!< @brief From sam3u_spi.c */
 
 /***********************************************************************************************************************
 Global variable definitions with scope limited to this local application.
@@ -62,6 +62,15 @@ Variable names shall start with "UserApp1_<type>" and be declared as static.
 static fnCode_type UserApp1_pfStateMachine;               /*!< @brief The state machine function pointer */
 //static u32 UserApp1_u32Timeout;                           /*!< @brief Timeout counter used across states */
 
+static SpiPeripheralType* UserApp1_Spi;
+static SpiConfigurationType UserApp1_eBladeDataflashSPI;
+
+static u8 UserApp1_au8RxBuffer[U16_UA1_RX_BUFFER_SIZE];
+static u8* UserApp1_pu8RxBufferNextChar;
+static u8* UserApp1_pu8RxBufferUnreadChar;
+
+static u8 UserApp1_au8MessageManufacturerID[] = {SPI_DUMMY, 0x9F, 0x27, 0x01, 0x00};
+static u32 UserApp1_CurrentMsgToken;
 
 /**********************************************************************************************************************
 Function Definitions
@@ -92,9 +101,24 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
+  UserApp1_pu8RxBufferUnreadChar = UserApp1_au8RxBuffer;
+  UserApp1_pu8RxBufferNextChar = UserApp1_au8RxBuffer;
+  
+  UserApp1_eBladeDataflashSPI.u32CsPin = BLADE_CS_PIN;
+  UserApp1_eBladeDataflashSPI.eBitOrder = SPI_MSB_FIRST;
+  UserApp1_eBladeDataflashSPI.SpiPeripheral = BLADE_SPI;
+  UserApp1_eBladeDataflashSPI.pCsGpioAddress = BLADE_BASE_PORT;
+  UserApp1_eBladeDataflashSPI.ppu8RxNextByte = &UserApp1_pu8RxBufferNextChar;
+  UserApp1_eBladeDataflashSPI.u16RxBufferSize = U16_UA1_RX_BUFFER_SIZE;
+  UserApp1_eBladeDataflashSPI.pu8RxBufferAddress = UserApp1_au8RxBuffer;
+  
+  UserApp1_Spi = SpiRequest(&UserApp1_eBladeDataflashSPI);
+  BLADE_SPI_FLAGS = 0;
+  
   /* If good initialization, set state to Idle */
   if( 1 )
   {
+    DebugPrintf("Blade dataflash task ready \n\r");
     UserApp1_pfStateMachine = UserApp1SM_Idle;
   }
   else
@@ -140,7 +164,12 @@ State Machine Function Definitions
 /* What does this state do? */
 static void UserApp1SM_Idle(void)
 {
-    
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    UserApp1_CurrentMsgToken = SpiWriteData(UserApp1_Spi, sizeof(UserApp1_au8MessageManufacturerID), UserApp1_au8MessageManufacturerID);
+    UserApp1_pfStateMachine = UserApp1SM_WaitResponse;
+  }
 } /* end UserApp1SM_Idle() */
      
 
@@ -151,7 +180,30 @@ static void UserApp1SM_Error(void)
   
 } /* end UserApp1SM_Error() */
 
-
+static void UserApp1SM_WaitResponse(void)
+{
+  u8 u8ManufacturerId = 0xff;
+  u8 u8DeviceId1 = 0xff;
+  u8 u8DeviceId2 = 0xff;
+  u8 u8Extended = 0xff;
+  u8 au8AsciiMsg[] = "FF\n\r";
+  
+  if(QueryMessageStatus(UserApp1_CurrentMsgToken) == COMPLETE)
+  {
+    UserApp1_pu8RxBufferUnreadChar++;
+    u8ManufacturerId = *UserApp1_pu8RxBufferUnreadChar++;
+    u8DeviceId1 = *UserApp1_pu8RxBufferUnreadChar++;
+    u8DeviceId2 = *UserApp1_pu8RxBufferUnreadChar++;
+    u8Extended = *UserApp1_pu8RxBufferUnreadChar++;
+    
+    DebugPrintf("Dataflash Manufacturer ID: 0x");
+    au8AsciiMsg[0] = HexToASCIICharUpper((u8ManufacturerId & 0xF0) >> 4);
+    au8AsciiMsg[1] = HexToASCIICharUpper((u8ManufacturerId & 0x0F) >> 0);
+    DebugPrintf(au8AsciiMsg);
+    
+    UserApp1_pfStateMachine = UserApp1SM_Idle;
+  }
+}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* End of File                                                                                                        */

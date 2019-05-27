@@ -44,7 +44,7 @@ Global variable definitions with scope across entire project.
 All Global variable names shall start with "G_<type>Spi"
 ***********************************************************************************************************************/
 /* New variables */
-u32 G_u32Spi0ApplicationFlags;                   /*!< @brief Status flags meant for application using this SPI peripheral */
+volatile u32 G_u32Spi0ApplicationFlags;                   /*!< @brief Status flags meant for application using this SPI peripheral */
 
 
 /*--------------------------------------------------------------------------------------------------------------------*/
