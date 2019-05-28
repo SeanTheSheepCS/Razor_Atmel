@@ -58,9 +58,10 @@ Global variable definitions with scope limited to this local application.
 Variable names shall start with "UserApp1_" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
-//static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
-static u8 grid[24][24];
+static u8 grid[U8_PLAYFIELDBOX_LENGTH][U8_PLAYFIELDBOX_LENGTH];
 static u8 snakeLength;
+static u8 nextRandomNumberOne;
+static u8 nextRandomNumberTwo;
 
 /**********************************************************************************************************************
 Function Definitions
@@ -91,6 +92,7 @@ void UserApp1Initialize(void)
   LcdClearScreen();
   HEARTBEAT_OFF();
   renderBorders();
+  initGame();
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -141,7 +143,15 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
+  static u32 msSinceLastMove = 0;
   static u8 direction = U8_SNAKE_DIRECTION_UP;
+  if(msSinceLastMove > BASE_UPDATE_PERIOD_MS)
+  {
+    updateSnakePosition(direction);
+    renderSnakeAndApple();
+    msSinceLastMove = 0;
+  }
+  msSinceLastMove++;
 } /* end UserApp1SM_Idle() */
     
 
@@ -152,9 +162,65 @@ static void UserApp1SM_Error(void)
   
 } /* end UserApp1SM_Error() */
 
+static void initGame(void)
+{
+  for(u8 row = 0; row < U8_PLAYFIELDBOX_LENGTH; row++)
+  {
+    for(u8 col = 0; col < U8_PLAYFIELDBOX_LENGTH; col++)
+    {
+      grid[row][col] = 0;
+    }
+  }
+  grid[U8_PLAYFIELDBOX_LENGTH/2][U8_PLAYFIELDBOX_LENGTH/2] = 2;
+  grid[(U8_PLAYFIELDBOX_LENGTH/2)+1][U8_PLAYFIELDBOX_LENGTH/2] = 3;
+  snakeLength = 2;
+  placeApple();
+}
+
 static void updateSnakePosition(u8 direction)
 {
-  
+  for(int row = 0; row < U8_PLAYFIELDBOX_LENGTH; row++)
+  {
+    for(int col = 0; col < U8_PLAYFIELDBOX_LENGTH; col++)
+    {
+      if(grid[row][col] == 2)
+      {
+        if(direction == U8_SNAKE_DIRECTION_UP)
+        {
+          grid[row-1][col] = 2;
+          grid[row][col] = 3;
+          incrementRNG(89);
+        }
+        else if(direction == U8_SNAKE_DIRECTION_DOWN)
+        {
+          incrementRNG(71);
+        }
+        else if(direction == U8_SNAKE_DIRECTION_LEFT)
+        {
+          incrementRNG(22);
+        } 
+        else if(direction == U8_SNAKE_DIRECTION_RIGHT)
+        {
+          incrementRNG(76);
+        }
+        else
+        {
+          DebugPrintf("How did you manage this?");
+        }
+      }
+      else if(grid[row][col] > 2)
+      {
+        if(grid[row][col] == snakeLength+1)
+        {
+          grid[row][col] = 0;
+        }
+        else
+        {
+          grid[row][col]++;
+        }
+      }
+    }
+  }
 }
 
 static void elongateSnake(void)
@@ -164,12 +230,35 @@ static void elongateSnake(void)
 
 static void placeApple(void)
 {
-  
+  grid[nextRandomNumberOne][nextRandomNumberTwo] = 1;
 }
 
 static void renderSnakeAndApple(void)
 {
+  u8 u8ppPlayArea[U8_PLAYFIELDBOX_LENGTH][U8_PLAYFIELDBOX_LENGTH/8];
+
+  for(u8 row = 0; row < U8_PLAYFIELDBOX_LENGTH; row++)
+  {
+    for(u8 col = 0; col < U8_PLAYFIELDBOX_LENGTH; col++)
+    {
+      u8ppPlayArea[row][col/8] = 0;
+    }
+  }
   
+  for(u8 row = 0; row < U8_PLAYFIELDBOX_LENGTH; row++)
+  {
+    for(u8 col = 0; col < U8_PLAYFIELDBOX_LENGTH; col++)
+    {
+      if(grid[row][col] != 0)
+      {
+        u8ppPlayArea[row][col/8] += (1 << ((col%8)));
+      }
+    }
+  }
+  PixelBlockType infoForPlayArea = {2 ,(2*8) ,U8_PLAYFIELDBOX_LENGTH ,U8_PLAYFIELDBOX_LENGTH};
+  u8* u8pAddressOfPlayArea = &(u8ppPlayArea[0][0]);
+  LcdLoadBitmap(u8pAddressOfPlayArea, &infoForPlayArea);
+  incrementRNG(211);
 }
 
 static void renderBorders(void)
@@ -200,9 +289,16 @@ static void renderBorders(void)
                            {128,0  ,0  ,0  ,1},
                            {128,0  ,0  ,0  ,1},
                            {128,255,255,255,1}};
-  PixelBlockType infoForScreen = {1 ,1 ,26 ,(5*8)};
+  PixelBlockType infoForScreen = {1 ,(1*8) ,26 ,(5*8)};
   u8* u8pAddressOfScreen = &(u8ppBorders[0][0]);
   LcdLoadBitmap(u8pAddressOfScreen, &infoForScreen);
+  incrementRNG(77);
+}
+
+static void incrementRNG(u8 num)
+{
+  nextRandomNumberOne = (nextRandomNumberOne+num) % U8_PLAYFIELDBOX_LENGTH;
+  nextRandomNumberTwo = (nextRandomNumberTwo+num+num) % U8_PLAYFIELDBOX_LENGTH;
 }
 
 /*--------------------------------------------------------------------------------------------------------------------*/

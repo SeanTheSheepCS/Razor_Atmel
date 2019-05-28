@@ -29,10 +29,13 @@ Type Definitions
 Constants / Definitions
 **********************************************************************************************************************/
 #define BASE_UPDATE_PERIOD_MS (u32)(500)
-#define U8_SNAKE_DIRECTION_UP (u8)(0);
-#define U8_SNAKE_DIRECTION_DOWN (u8)(1);
-#define U8_SNAKE_DIRECTION_LEFT (u8)(2);
-#define U8_SNAKE_DIRECTION_RIGHT (u8)(3);
+
+#define U8_SNAKE_DIRECTION_UP (u8)(0)
+#define U8_SNAKE_DIRECTION_DOWN (u8)(1)
+#define U8_SNAKE_DIRECTION_LEFT (u8)(2)
+#define U8_SNAKE_DIRECTION_RIGHT (u8)(3)
+
+#define U8_PLAYFIELDBOX_LENGTH (u8)(24)
 
 
 /**********************************************************************************************************************
@@ -66,6 +69,8 @@ static void elongateSnake(void);
 static void placeApple(void);
 static void renderSnakeAndApple(void);
 static void renderBorders(void);
+static void initGame(void);
+static void incrementRNG(u8 num);
 
 #endif /* __USER_APP1_H */
 
