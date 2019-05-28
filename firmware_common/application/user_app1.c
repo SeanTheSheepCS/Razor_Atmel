@@ -59,7 +59,8 @@ Variable names shall start with "UserApp1_" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
 //static u32 UserApp1_u32Timeout;                      /* Timeout counter used across states */
-
+static u8 grid[24][24];
+static u8 snakeLength;
 
 /**********************************************************************************************************************
 Function Definitions
@@ -87,9 +88,9 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
-  //Make the LED blink 
+  LcdClearScreen();
   HEARTBEAT_OFF();
-  
+  renderBorders();
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -140,26 +141,7 @@ State Machine Function Definitions
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
 {
-  DebugPrintf("HI");
-  static u32 u32Counter = 0;
-  static bool isLightOn = FALSE;
-  
-  
-  if(u32Counter >= COUNTER_LIMIT_MS)
-  {
-    if(isLightOn)
-    {
-      LedOff(BLUE1);
-      isLightOn = FALSE;
-    }
-    else
-    {
-      LedOn(BLUE1);
-      isLightOn = TRUE;
-    }
-    u32Counter = 0;
-  }
-  u32Counter++;
+  static u8 direction = U8_SNAKE_DIRECTION_UP;
 } /* end UserApp1SM_Idle() */
     
 
@@ -167,10 +149,61 @@ static void UserApp1SM_Idle(void)
 /* Handle an error */
 static void UserApp1SM_Error(void)          
 {
-  DebugPrintf("ERROR STATE");
+  
 } /* end UserApp1SM_Error() */
 
+static void updateSnakePosition(u8 direction)
+{
+  
+}
 
+static void elongateSnake(void)
+{
+  
+}
+
+static void placeApple(void)
+{
+  
+}
+
+static void renderSnakeAndApple(void)
+{
+  
+}
+
+static void renderBorders(void)
+{
+  u8 u8ppBorders[26][5] = {{128,255,255,255,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,0  ,0  ,0  ,1},
+                           {128,255,255,255,1}};
+  PixelBlockType infoForScreen = {1 ,1 ,26 ,(5*8)};
+  u8* u8pAddressOfScreen = &(u8ppBorders[0][0]);
+  LcdLoadBitmap(u8pAddressOfScreen, &infoForScreen);
+}
 
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* End of File                                                                                                        */

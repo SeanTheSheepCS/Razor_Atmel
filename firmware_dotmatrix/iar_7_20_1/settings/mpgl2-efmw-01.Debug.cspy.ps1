@@ -23,9 +23,9 @@
 
 if ($debugfile -eq "")
 {
-& "C:\Program Files (x86)\IAR Systems\EWARM_8_32_2\common\bin\cspybat" -f "C:\Users\ENGENUICS5\Desktop\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --backend -f "C:\Users\ENGENUICS5\Desktop\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\EWARM_8_32_2\common\bin\cspybat" -f "C:\Users\ENGENUICS5\Desktop\2019_camps\Sean Kenny\Snake\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --backend -f "C:\Users\ENGENUICS5\Desktop\2019_camps\Sean Kenny\Snake\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
 }
 else
 {
-& "C:\Program Files (x86)\IAR Systems\EWARM_8_32_2\common\bin\cspybat" -f "C:\Users\ENGENUICS5\Desktop\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\ENGENUICS5\Desktop\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
+& "C:\Program Files (x86)\IAR Systems\EWARM_8_32_2\common\bin\cspybat" -f "C:\Users\ENGENUICS5\Desktop\2019_camps\Sean Kenny\Snake\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.general.xcl" --debug_file=$debugfile --backend -f "C:\Users\ENGENUICS5\Desktop\2019_camps\Sean Kenny\Snake\Razor_Atmel\firmware_dotmatrix\iar_7_20_1\settings\mpgl2-efmw-01.Debug.driver.xcl" 
 }

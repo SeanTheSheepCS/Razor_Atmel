@@ -28,8 +28,12 @@ Type Definitions
 /**********************************************************************************************************************
 Constants / Definitions
 **********************************************************************************************************************/
-#define COUNTER_LIMIT_MS (u32)5000
-#define ALTERNATING_COLOUR_LIMIT_MS (u32)500
+#define BASE_UPDATE_PERIOD_MS (u32)(500)
+#define U8_SNAKE_DIRECTION_UP (u8)(0);
+#define U8_SNAKE_DIRECTION_DOWN (u8)(1);
+#define U8_SNAKE_DIRECTION_LEFT (u8)(2);
+#define U8_SNAKE_DIRECTION_RIGHT (u8)(3);
+
 
 /**********************************************************************************************************************
 Function Declarations
@@ -46,7 +50,6 @@ Function Declarations
 void UserApp1Initialize(void);
 void UserApp1RunActiveState(void);
 
-
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* Private functions                                                                                                  */
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -56,9 +59,13 @@ void UserApp1RunActiveState(void);
 State Machine Declarations
 ***********************************************************************************************************************/
 static void UserApp1SM_Idle(void);    
-
 static void UserApp1SM_Error(void);         
 
+static void updateSnakePosition(u8 direction);
+static void elongateSnake(void);
+static void placeApple(void);
+static void renderSnakeAndApple(void);
+static void renderBorders(void);
 
 #endif /* __USER_APP1_H */
 
