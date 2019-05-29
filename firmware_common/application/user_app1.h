@@ -72,6 +72,7 @@ static void renderSnakeAndApple(void);
 static void renderBorders(void);
 static void initGame(void);
 static void incrementRNG(u8 num);
+static void detectChangesInDirection(u8* ptDirection);
 
 #endif /* __USER_APP1_H */
 

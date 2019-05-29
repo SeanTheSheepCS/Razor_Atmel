@@ -147,6 +147,10 @@ static void UserApp1SM_Idle(void)
   static u8 direction = U8_SNAKE_DIRECTION_UP;
   if(msSinceLastMove > BASE_UPDATE_PERIOD_MS)
   {
+    detectChangesInDirection(&direction);
+    u8 testArr[2] = {0,0};
+    testArr[0] = direction;
+    DebugPrintf(testArr);
     updateSnakePosition(direction);
     renderSnakeAndApple();
     msSinceLastMove = 0;
@@ -165,6 +169,36 @@ static void UserApp1SM_Error(void)
 static void UserApp1SM_GameOver(void)
 {
   
+}
+
+static void detectChangesInDirection(u8* ptDirection)
+{
+  static u8 lastHSlidePosition = 0;
+  static u8 lastVSlidePosition = 0;
+  if(CaptouchCurrentHSlidePosition() != lastHSlidePosition)
+  {
+    if(CaptouchCurrentHSlidePosition() > 127)
+    {
+      *ptDirection = U8_SNAKE_DIRECTION_UP;
+    }
+    else
+    {
+      *ptDirection = U8_SNAKE_DIRECTION_DOWN;
+    }
+    lastHSlidePosition = CaptouchCurrentHSlidePosition();
+  }
+  if(CaptouchCurrentVSlidePosition() != lastVSlidePosition)
+  {
+    if(CaptouchCurrentVSlidePosition() > 127)
+    {
+      *ptDirection = U8_SNAKE_DIRECTION_RIGHT;
+    }
+    else
+    {
+      *ptDirection = U8_SNAKE_DIRECTION_LEFT;
+    }
+    lastVSlidePosition = CaptouchCurrentVSlidePosition();
+  }
 }
 
 static void initGame(void)
