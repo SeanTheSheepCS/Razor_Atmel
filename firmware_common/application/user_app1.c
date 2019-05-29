@@ -162,6 +162,11 @@ static void UserApp1SM_Error(void)
   
 } /* end UserApp1SM_Error() */
 
+static void UserApp1SM_GameOver(void)
+{
+  
+}
+
 static void initGame(void)
 {
   for(u8 row = 0; row < U8_PLAYFIELDBOX_LENGTH; row++)
@@ -187,20 +192,54 @@ static void updateSnakePosition(u8 direction)
       {
         if(direction == U8_SNAKE_DIRECTION_UP)
         {
-          grid[row-1][col] = 2;
-          grid[row][col] = 3;
+          if(row == 0)
+          {
+            UserApp1_StateMachine = UserApp1SM_GameOver;
+          }
+          else
+          {
+            grid[row-1][col] = 2;
+            grid[row][col] = 3;
+          }
           incrementRNG(89);
         }
         else if(direction == U8_SNAKE_DIRECTION_DOWN)
         {
+          if(row == U8_PLAYFIELDBOX_LENGTH-1)
+          {
+            UserApp1_StateMachine = UserApp1SM_GameOver;
+          }
+          else
+          {
+            grid[row+1][col] = 2;
+            grid[row][col] = 3;
+          }
           incrementRNG(71);
         }
         else if(direction == U8_SNAKE_DIRECTION_LEFT)
         {
+          if(col == 0)
+          {
+            UserApp1_StateMachine = UserApp1SM_GameOver;
+          }
+          else
+          {
+            grid[row][col-1] = 2;
+            grid[row][col] = 3;
+          }
           incrementRNG(22);
         } 
         else if(direction == U8_SNAKE_DIRECTION_RIGHT)
         {
+          if(col == U8_PLAYFIELDBOX_LENGTH-1)
+          {
+            UserApp1_StateMachine = UserApp1SM_GameOver;
+          }
+          else
+          {
+            grid[row][col+1] = 2;
+            grid[row][col] = 3;
+          }
           incrementRNG(76);
         }
         else

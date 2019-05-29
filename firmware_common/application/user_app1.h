@@ -63,6 +63,7 @@ State Machine Declarations
 ***********************************************************************************************************************/
 static void UserApp1SM_Idle(void);    
 static void UserApp1SM_Error(void);         
+static void UserApp1SM_GameOver(void);
 
 static void updateSnakePosition(u8 direction);
 static void elongateSnake(void);
