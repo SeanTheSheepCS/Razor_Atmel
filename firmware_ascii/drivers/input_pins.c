@@ -42,6 +42,10 @@ void InputPinInitialize(void)
 {
   u32 u32PortAInterruptMask = 0;
   u32 u32PortBInterruptMask = 0;
+  u32 u32PortAActiveLowMask = 0;
+  u32 u32PortBActiveLowMask = 0;
+  u32 u32PortAActiveHighMask = 0;
+  u32 u32PortBActiveHighMask = 0;
   
   /* Setup default data for all of the buttons in the system */
   for(u8 i = 0; i < INPUT_PINS_IN_USE; i++)
@@ -57,10 +61,26 @@ void InputPinInitialize(void)
     if(Pins_asArray[i].ePort == PIN_PORTA)
     {
       u32PortAInterruptMask |= Pin_au32InputPins[i];
+      if(Pins_asArray[i].eActiveState == INPUT_ACTIVE_HIGH)
+      {
+        u32PortAActiveHighMask |= Pin_au32InputPins[i];
+      }
+      else if(Pins_asArray[i].eActiveState == INPUT_ACTIVE_LOW)
+      {
+        u32PortAActiveLowMask |= Pin_au32InputPins[i];
+      }
     }
     else if(Pins_asArray[i].ePort == PIN_PORTB)
     {
       u32PortBInterruptMask |= Pin_au32InputPins[i];
+      if(Pins_asArray[i].eActiveState == INPUT_ACTIVE_HIGH)
+      {
+        u32PortBActiveHighMask |= Pin_au32InputPins[i];
+      }
+      else if(Pins_asArray[i].eActiveState == INPUT_ACTIVE_LOW)
+      {
+        u32PortBActiveLowMask |= Pin_au32InputPins[i];
+      }
     }
   }
 
@@ -76,7 +96,7 @@ void InputPinInitialize(void)
   AT91C_BASE_PIOB->PIO_ODR = u32PortBInterruptMask;
   /* Turn on glitch input filtering */
   AT91C_BASE_PIOA->PIO_IFER = u32PortAInterruptMask;
-  AT91C_BASE_PIOB->PIO_IFER = u32PortBInterruptMask;
+  AT91C_BASE_PIOB->PIO_IFER = u32PortBInterruptMask; 
   
   /* Read the ISR register to clear all the current flags */
   u32PortAInterruptMask = AT91C_BASE_PIOA->PIO_ISR;

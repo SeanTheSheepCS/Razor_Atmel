@@ -232,7 +232,6 @@ void PIOA_IrqHandler(void)
   
   /* Examine button interrupts */
   u32ButtonInterrupts = u32GPIOInterruptSources & GPIOA_BUTTONS;
-  LedOn(RED);
   /* Check if any port A buttons interrupted */
   if(u32ButtonInterrupts)
   {

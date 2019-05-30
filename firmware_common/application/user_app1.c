@@ -145,6 +145,10 @@ static void UserApp1SM_Idle(void)
   {
     LedOn(BLUE);
   }
+  else
+  {
+    LedOff(BLUE);
+  }
 } /* end UserApp1SM_Idle() */
      
 
