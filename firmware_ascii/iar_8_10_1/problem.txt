@@ -1,4 +1,0 @@
-Problem:
--Changes in voltage are not detected because
--PinDebounce is not changed in PIOA_IrqHandler since
--The interrupt is not triggered

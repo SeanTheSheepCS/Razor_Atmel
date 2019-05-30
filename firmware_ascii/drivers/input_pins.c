@@ -174,8 +174,6 @@ void InputPinSM_PinActive(void)
   u32 *pu32PortAddress;
   u32 *pu32InterruptAddress;
   
-  LedOn(RED);
-  
   /* Start by resseting back to Idle in case no buttons are active */
   Pin_pfnStateMachine = InputPinSM_Idle;
 

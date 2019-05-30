@@ -140,10 +140,10 @@ State Machine Function Definitions
 /* What does this state do? */
 static void UserApp1SM_Idle(void)
 {
-  u8 au8ScoreDisplay[] = "Score: 000000";
+  u8 au8ScoreDisplay[] = "Score: 00000000";
   if(IsPinActive(MOSI_PIN))
   {
-    LedOn(BLUE);
+    LCDMessage(LINE1_START_ADDR, au8ScoreDisplay);
   }
   else
   {
