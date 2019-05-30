@@ -50,6 +50,7 @@ Function Declarations
 /*--------------------------------------------------------------------------------------------------------------------*/
 bool IsPinActive(u32 u32InputPin);
 void PinActiveAcknowledge(u32 u32InputPin);
+bool HasThePinBeenActivated(u32 u32InputPin);
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @protectedsection */                                                                                            

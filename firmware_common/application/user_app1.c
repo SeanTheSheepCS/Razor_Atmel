@@ -92,6 +92,8 @@ Promises:
 */
 void UserApp1Initialize(void)
 {
+  LcdCommand(LCD_CLEAR_CMD);
+  LcdMessage(LINE1_START_ADDR, "Score: 00000000");
   /* If good initialization, set state to Idle */
   if( 1 )
   {
@@ -140,14 +142,23 @@ State Machine Function Definitions
 /* What does this state do? */
 static void UserApp1SM_Idle(void)
 {
-  u8 au8ScoreDisplay[] = "Score: 00000000";
-  if(IsPinActive(MOSI_PIN))
+  static u8 au8ScoreDisplay[] = "Score: 00000000";
+  if(HasThePinBeenActivated(MOSI_PIN))
   {
-    LCDMessage(LINE1_START_ADDR, au8ScoreDisplay);
-  }
-  else
-  {
-    LedOff(BLUE);
+    for(u8 i = 14; i >= 7; i--)
+    {
+      if(au8ScoreDisplay[i] == '0')
+      {
+        au8ScoreDisplay[i] = '1';
+        break;
+      }
+      else
+      {
+        au8ScoreDisplay[i] = '0';
+      }
+    }
+    LcdMessage(LINE1_START_ADDR, au8ScoreDisplay);
+    PinActiveAcknowledge(MOSI_PIN);
   }
 } /* end UserApp1SM_Idle() */
      

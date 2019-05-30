@@ -130,6 +130,11 @@ bool IsPinActive(u32 u32InputPin)
   }
 }
 
+bool HasThePinBeenActivated(u32 u32InputPin)
+{
+  return Pin_abNewPress[u32InputPin];
+}
+
 void PinActiveAcknowledge(u32 u32InputPin)
 {
   Pin_abNewPress[u32InputPin] = FALSE;
