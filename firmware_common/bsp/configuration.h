@@ -73,6 +73,7 @@ Includes
 #include "ant.h"
 #include "ant_api.h"
 #include "buttons.h"
+#include "input_pins.h"
 #include "leds.h" 
 #include "messaging.h"
 #include "timer.h" 

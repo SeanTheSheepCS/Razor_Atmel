@@ -401,7 +401,7 @@ static void ButtonSM_ButtonActive(void)
 {
   u32 *pu32PortAddress;
   u32 *pu32InterruptAddress;
-
+  
   /* Start by resseting back to Idle in case no buttons are active */
   Button_pfnStateMachine = ButtonSM_Idle;
 

@@ -34,6 +34,7 @@ FIRMWARE_SUB_REV1: should be updated when a pull request is made to the MASTER b
 #define _APPLICATION_FLAGS_ANT          0x00000010        /*!< G_u32ApplicationFlags AntStateMachine is initialized */
 #define _APPLICATION_FLAGS_TIMER        0x00000020        /*!< G_u32ApplicationFlags TimerStateMachine is initialized */
 #define _APPLICATION_FLAGS_ADC          0x00000040        /*!< G_u32ApplicationFlags Adc12StateMachine is initialized */
+#define _APPLICATION_FLAGS_PIN          0x00000080        /*!< G_u32ApplicationFlags PinStateMachine is initialized */
 
 #ifdef EIE1
 /* EIE1 specific application flags */

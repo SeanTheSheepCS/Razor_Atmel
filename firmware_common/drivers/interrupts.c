@@ -219,7 +219,7 @@ void PIOA_IrqHandler(void)
   u32 u32GPIOInterruptSources;
   u32 u32ButtonInterrupts;
   u32 u32CurrentButtonLocation;
-
+  
   /* Grab a snapshot of the current PORTA status flags (clears all flags) */
   u32GPIOInterruptSources  = AT91C_BASE_PIOA->PIO_ISR;
 
@@ -277,6 +277,8 @@ void PIOB_IrqHandler(void)
   u32 u32ButtonInterrupts;
   u32 u32CurrentButtonLocation;
 
+  LedOn(PURPLE);
+  
   /* Grab a snapshot of the current PORTB status flags (clears all flags) */
   u32GPIOInterruptSources  = AT91C_BASE_PIOB->PIO_ISR;
 

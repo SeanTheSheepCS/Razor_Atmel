@@ -57,6 +57,7 @@ void main(void)
 
   /* Debug messages through DebugPrintf() are available from here */
   ButtonInitialize();
+  InputPinInitialize();
   TimerInitialize();  
   SpiInitialize();
   SspInitialize();
@@ -78,7 +79,6 @@ void main(void)
   /* Exit initialization */
   SystemStatusReport();
   G_u32SystemFlags &= ~_SYSTEM_INITIALIZING;
-    
   /* Super loop */  
   while(1)
   {
@@ -88,6 +88,7 @@ void main(void)
     /* Drivers */
     LedUpdate();
     ButtonRunActiveState();
+    InputPinRunActiveState();
     UartRunActiveState();
     TimerRunActiveState(); 
     SpiRunActiveState();
