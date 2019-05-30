@@ -143,7 +143,7 @@ static void UserApp1SM_Idle(void)
   u8 au8ScoreDisplay[] = "Score: 000000";
   if(IsPinActive(MOSI_PIN))
   {
-    DebugPrintf("MOSI pin is active!");
+    LedOn(BLUE);
   }
 } /* end UserApp1SM_Idle() */
      

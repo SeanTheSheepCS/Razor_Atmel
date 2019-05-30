@@ -32,10 +32,10 @@ static bool Pin_abNewPress[INPUT_PINS_IN_USE];               /*!< @brief Flags t
 /* Add all of the GPIO pin names for the buttons in the system.  
 The order of the definitions below must match the order of the definitions provided in configuration.h */ 
 
-static const u32 Pin_au32InputPins[INPUT_PINS_IN_USE] = { PA_21_SD_USPI1_MISO , PA_20_SD_USPI1_MOSI };
+static const u32 Pin_au32InputPins[INPUT_PINS_IN_USE] = { PA_14_BLADE_MOSI , PA_13_BLADE_MISO };
 static PinConfigType Pins_asArray[INPUT_PINS_IN_USE] = 
-{{INPUT_ACTIVE_HIGH, PIN_PORTA}, /* MOSI  */
- {INPUT_ACTIVE_HIGH, PIN_PORTA}, /* MISO  */
+{{INPUT_ACTIVE_LOW, PIN_PORTA}, /* MOSI  */
+ {INPUT_ACTIVE_LOW, PIN_PORTA}, /* MISO  */
 };   
 
 void InputPinInitialize(void)
@@ -67,6 +67,16 @@ void InputPinInitialize(void)
   /* Enable PIO interrupts */
   AT91C_BASE_PIOA->PIO_IER = u32PortAInterruptMask;
   AT91C_BASE_PIOB->PIO_IER = u32PortBInterruptMask;
+  
+  /* Disables control on these pins */
+  AT91C_BASE_PIOA->PIO_PDR = u32PortAInterruptMask;
+  AT91C_BASE_PIOB->PIO_PDR = u32PortBInterruptMask;
+  /* Makes these pins inputs only */
+  AT91C_BASE_PIOA->PIO_ODR = u32PortAInterruptMask;
+  AT91C_BASE_PIOB->PIO_ODR = u32PortBInterruptMask;
+  /* Turn on glitch input filtering */
+  AT91C_BASE_PIOA->PIO_IFER = u32PortAInterruptMask;
+  AT91C_BASE_PIOB->PIO_IFER = u32PortBInterruptMask;
   
   /* Read the ISR register to clear all the current flags */
   u32PortAInterruptMask = AT91C_BASE_PIOA->PIO_ISR;
@@ -163,29 +173,13 @@ void InputPinSM_PinActive(void)
       
       if( IsTimeUp((u32*)&G_au32PinDebounceTimeStart[i], PIN_DEBOUNCE_TIME) )
       {
-        /* Active low: get current state of button */
-        if(Pins_asArray[i].eActiveState == INPUT_ACTIVE_LOW)
-        {
-          if( ~(*pu32PortAddress) & Pin_au32InputPins[i] )
-          {          
-            Pin_aeNewState[i] = VOLTAGE_LOW;
-          }
-          else
-          {
-            Pin_aeNewState[i] = VOLTAGE_HIGH;
-          }
+        if( ~(*pu32PortAddress) & Pin_au32InputPins[i] )
+        {          
+          Pin_aeNewState[i] = VOLTAGE_LOW;
         }
-        /* Active high */
         else
         {
-          if( *pu32PortAddress & Pin_au32InputPins[i] == INPUT_ACTIVE_HIGH )
-          {          
-            Pin_aeNewState[i] = VOLTAGE_HIGH;
-          }
-          else
-          {
-            Pin_aeNewState[i] = VOLTAGE_LOW;
-          }
+          Pin_aeNewState[i] = VOLTAGE_HIGH;
         }
         
         /* Update if the button state has changed */
