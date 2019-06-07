@@ -1,5 +1,5 @@
 /*!*********************************************************************************************************************
-@file user_app1.c                                                                
+@file finishGateApp.c                                                                
 @brief User's tasks / applications are written here.  This description
 should be replaced by something specific to the task.
 
@@ -142,7 +142,7 @@ State Machine Function Definitions
 /* What does this state do? */
 static void UserApp1SM_Idle(void)
 {
-  static u8 au8ScoreDisplay[] = "Score: 00000000";
+  static u8 au8ScoreDisplay[] = "Time: 00000000";
   if(HasThePinBeenActivated(MOSI_PIN))
   {
     for(u8 i = 14; i >= 7; i--)
