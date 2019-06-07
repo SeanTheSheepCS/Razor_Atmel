@@ -1,5 +1,5 @@
 /*!*********************************************************************************************************************
-@file user_app1.c                                                                
+@file startGateApp.c                                                                
 @brief User's tasks / applications are written here.  This description
 should be replaced by something specific to the task.
 
