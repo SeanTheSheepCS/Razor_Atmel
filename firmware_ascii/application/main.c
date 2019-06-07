@@ -71,7 +71,7 @@ void main(void)
   SdCardInitialize();
 
   /* Application initialization */
-  UserApp1Initialize();
+  IRStartGateInitialize();
   UserApp2Initialize();
   UserApp3Initialize();
 
@@ -103,7 +103,7 @@ void main(void)
     SdCardRunActiveState();
 
     /* Applications */
-    UserApp1RunActiveState();
+    IRStartGateRunActiveState();
     UserApp2RunActiveState();
     UserApp3RunActiveState();
     

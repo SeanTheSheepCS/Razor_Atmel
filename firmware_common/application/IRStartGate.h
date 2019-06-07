@@ -15,8 +15,8 @@ To start a new task using this user_app1 as a template:
 
 **********************************************************************************************************************/
 
-#ifndef __IRSTARTGATE_H
-#define __IRSTARTGATE_H
+#ifndef __USER_APP1_H
+#define __USER_APP1_H
 
 /**********************************************************************************************************************
 Type Definitions
@@ -35,12 +35,9 @@ Function Declarations
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @protectedsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
-void IRStartGateInitialize(void);
-void IRStartGateRunActiveState(void);
+void UserApp1Initialize(void);
+void UserApp1RunActiveState(void);
 
-void IRStartGateResetTimer(void);
-void IRStartGateIncrementTimer(void);
-void IRStartGateDisplayTimer(void);
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @privatesection */                                                                                            
@@ -50,10 +47,8 @@ void IRStartGateDisplayTimer(void);
 /***********************************************************************************************************************
 State Machine Declarations
 ***********************************************************************************************************************/
-static void IRStartGateSM_Idle(void);
-static void IRStartGateSM_TimerActive(void);
-static void IRStartGateSM_ReplyRecieved(void);
-static void IRStartGateSM_Error(void);         
+static void UserApp1SM_Idle(void);    
+static void UserApp1SM_Error(void);         
 
 
 
@@ -62,7 +57,7 @@ Constants / Definitions
 **********************************************************************************************************************/
 
 
-#endif /* __IRSTARTGATE_H */
+#endif /* __USER_APP1_H */
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* End of File                                                                                                        */
 /*--------------------------------------------------------------------------------------------------------------------*/

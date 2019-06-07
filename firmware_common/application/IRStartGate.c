@@ -1,5 +1,5 @@
 /*!*********************************************************************************************************************
-@file user_app1.c                                                                
+@file startGateApp.c                                                                
 @brief User's tasks / applications are written here.  This description
 should be replaced by something specific to the task.
 
@@ -59,10 +59,9 @@ extern volatile u32 G_u32ApplicationFlags;                /*!< @brief From main.
 Global variable definitions with scope limited to this local application.
 Variable names shall start with "UserApp1_<type>" and be declared as static.
 ***********************************************************************************************************************/
-static fnCode_type IRStartGate_pfStateMachine;               /*!< @brief The state machine function pointer */
+static fnCode_type UserApp1_pfStateMachine;               /*!< @brief The state machine function pointer */
 //static u32 UserApp1_u32Timeout;                           /*!< @brief Timeout counter used across states */
-static u8 IRStartGate_au8GenericReadyMessage[] = "Ready!";
-static u8 IRStartGate_au8TimeDisplay[] = "Time: 00:00.000";
+
 
 /**********************************************************************************************************************
 Function Definitions
@@ -91,19 +90,19 @@ Promises:
 - NONE
 
 */
-void IRStartGateInitialize(void)
+void UserApp1Initialize(void)
 {
   LcdCommand(LCD_CLEAR_CMD);
-  LcdMessage(LINE1_START_ADDR, IRStartGate_au8GenericReadyMessage);
+  LcdMessage(LINE1_START_ADDR, "Score: 00000000");
   /* If good initialization, set state to Idle */
   if( 1 )
   {
-    IRStartGate_pfStateMachine = IRStartGateSM_Idle;
+    UserApp1_pfStateMachine = UserApp1SM_Idle;
   }
   else
   {
     /* The task isn't properly initialized, so shut it down and don't run */
-    IRStartGate_pfStateMachine = IRStartGateSM_Error;
+    UserApp1_pfStateMachine = UserApp1SM_Error;
   }
 
 } /* end UserApp1Initialize() */
@@ -124,87 +123,11 @@ Promises:
 - Calls the function to pointed by the state machine function pointer
 
 */
-void IRStartGateRunActiveState(void)
+void UserApp1RunActiveState(void)
 {
-  IRStartGate_pfStateMachine();
+  UserApp1_pfStateMachine();
 
 } /* end UserApp1RunActiveState */
-
-static void IRStartGateIncrementTimer()
-{
-  /* MILLISECOND MANAGER */
-  for(u8 i = 14; i >= 12; i--)
-  {
-    if(IRStartGate_au8TimeDisplay[i] != '9')
-    {
-      IRStartGate_au8TimeDisplay[i] = IRStartGate_au8TimeDisplay[i] + 1;
-      return;
-    }
-    else
-    {
-      IRStartGate_au8TimeDisplay[i] = '0';
-    }
-  }
-  
-  /* SECOND MANAGER */
-  if(IRStartGate_au8TimeDisplay[10] != '9')
-  {
-    IRStartGate_au8TimeDisplay[10] = IRStartGate_au8TimeDisplay[10] + 1;
-    return;
-  }
-  else
-  {
-    IRStartGate_au8TimeDisplay[10] = '0';
-  }
-  
-  if(IRStartGate_au8TimeDisplay[9] != '5')
-  {
-    IRStartGate_au8TimeDisplay[9]++;
-    return;
-  }
-  else
-  {
-    IRStartGate_au8TimeDisplay[9] = '0';
-  }
-  
-  /* MINUTE MANAGER */
-  if(IRStartGate_au8TimeDisplay[7] != '9')
-  {
-    IRStartGate_au8TimeDisplay[7]++;
-    return;
-  }
-  else
-  {
-    IRStartGate_au8TimeDisplay[7] = '0';
-  }
-  
-  if(IRStartGate_au8TimeDisplay[6] != '5')
-  {
-    IRStartGate_au8TimeDisplay[6]++;
-    return;
-  }
-  else
-  {
-    IRStartGate_au8TimeDisplay[6] = '0';
-  }
-}
-
-static void IRStartGateDisplayTimer()
-{
-  LcdClearChars(LINE1_START_ADDR, 15);
-  LcdMessage(LINE1_START_ADDR, IRStartGate_au8TimeDisplay);
-}
-
-static void IRStartGateResetTimer()
-{
-  IRStartGate_au8TimeDisplay[14] = '0';
-  IRStartGate_au8TimeDisplay[13] = '0';
-  IRStartGate_au8TimeDisplay[12] = '0';
-  IRStartGate_au8TimeDisplay[10] = '0';
-  IRStartGate_au8TimeDisplay[9] = '0';
-  IRStartGate_au8TimeDisplay[7] = '0';
-  IRStartGate_au8TimeDisplay[6] = '0';
-}
 
 
 /*------------------------------------------------------------------------------------------------------------------*/
@@ -217,45 +140,32 @@ State Machine Function Definitions
 **********************************************************************************************************************/
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* What does this state do? */
-static void IRStartGateSM_Idle(void)
+static void UserApp1SM_Idle(void)
 {
-  if(1)
+  static u8 au8ScoreDisplay[] = "Score: 00000000";
+  if(HasThePinBeenActivated(MOSI_PIN))
   {
-    IRStartGate_pfStateMachine = IRStartGateSM_TimerActive;
-  }
-  if(HasThePinBeenActivated(UPOMI_PIN))
-  {    
-    IRStartGate_pfStateMachine = IRStartGateSM_TimerActive;
-    PinActiveAcknowledge(UPOMI_PIN);
+    for(u8 i = 14; i >= 7; i--)
+    {
+      if(au8ScoreDisplay[i] == '0')
+      {
+        au8ScoreDisplay[i] = '1';
+        break;
+      }
+      else
+      {
+        au8ScoreDisplay[i] = '0';
+      }
+    }
+    LcdMessage(LINE1_START_ADDR, au8ScoreDisplay);
+    PinActiveAcknowledge(MOSI_PIN);
   }
 } /* end UserApp1SM_Idle() */
      
-static void IRStartGateSM_TimerActive(void)
-{
-  IRStartGateIncrementTimer();
-  if(G_u32SystemTime1ms % 19 == 0)
-  {
-    IRStartGateDisplayTimer();
-  }
-  
-  if(IsButtonPressed(BUTTON0))
-  {
-    LcdCommand(LCD_CLEAR_CMD);
-    LcdMessage(LINE1_START_ADDR, IRStartGate_au8GenericReadyMessage);
-    IRStartGateResetTimer();
-    IRStartGate_pfStateMachine = IRStartGateSM_Idle;
-  }
-  
-}
-
-static void IRStartGateSM_ReplyRecieved(void)
-{
-  
-}
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */
-static void IRStartGateSM_Error(void)          
+static void UserApp1SM_Error(void)          
 {
   
 } /* end UserApp1SM_Error() */

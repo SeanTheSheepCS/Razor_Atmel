@@ -11,7 +11,7 @@ Type Definitions
 ***********************************************************************************************************************/
 
 typedef enum {VOLTAGE_LOW = 0, VOLTAGE_HIGH = 1} InputStateType; 
-typedef enum {MOSI_PIN = 0, MISO_PIN = 1} PinNameType;
+typedef enum {UPOMI_PIN = 0, UPIMO_PIN = 1} PinNameType;
 typedef enum {PIN_PORTA = 0, PIN_PORTB = 0x80} PinPortType;
 typedef enum {INPUT_ACTIVE_LOW = 0, INPUT_ACTIVE_HIGH = 1} InputActiveType;
 
@@ -35,11 +35,11 @@ Constants / Definitions
 #define PIN_INIT_MSG_TIMEOUT         (u32)1000     /* Time in ms for init message to send */
 #define PIN_DEBOUNCE_TIME            (u32)10       /* Time in ms for button debouncing */
 
-#define GPIOA_PINS (u32)(PA_14_BLADE_MOSI | PA_13_BLADE_MISO)
+#define GPIOA_PINS (u32)(PA_12_BLADE_UPOMI | PA_11_BLADE_UPIMO)
 #define INPUT_PINS_IN_USE 2
   
-#define MOSI_PIN 0
-#define MISO_PIN 1
+#define UPOMI_PIN 0
+#define UPIMO_PIN 1
 
 /***********************************************************************************************************************
 Function Declarations

@@ -32,10 +32,10 @@ static bool Pin_abNewPress[INPUT_PINS_IN_USE];               /*!< @brief Flags t
 /* Add all of the GPIO pin names for the buttons in the system.  
 The order of the definitions below must match the order of the definitions provided in configuration.h */ 
 
-static const u32 Pin_au32InputPins[INPUT_PINS_IN_USE] = { PA_14_BLADE_MOSI , PA_13_BLADE_MISO };
+static const u32 Pin_au32InputPins[INPUT_PINS_IN_USE] = { PA_12_BLADE_UPOMI , PA_11_BLADE_UPIMO};
 static PinConfigType Pins_asArray[INPUT_PINS_IN_USE] = 
-{{INPUT_ACTIVE_LOW, PIN_PORTA}, /* MOSI  */
- {INPUT_ACTIVE_LOW, PIN_PORTA}, /* MISO  */
+{{INPUT_ACTIVE_LOW, PIN_PORTA}, /* UPOMI  */
+ {INPUT_ACTIVE_LOW, PIN_PORTA}, /* UPIMO  */
 };   
 
 void InputPinInitialize(void)

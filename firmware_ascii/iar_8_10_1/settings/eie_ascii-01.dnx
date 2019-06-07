@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <settings>
     <DebugChecksum>
-        <Checksum>1108934021</Checksum>
+        <Checksum>4039458388</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -25,8 +25,8 @@
         <ShowArgs>0</ShowArgs>
     </CallStack>
     <Disassembly>
-        <InstrCount>0</InstrCount>
         <MixedMode>1</MixedMode>
+        <InstrCount>0</InstrCount>
     </Disassembly>
     <JLinkDriver>
         <CStepIntDis>_ 0</CStepIntDis>
@@ -53,6 +53,10 @@
         <Bp1>_ 0 "EMUL_CODE" "{$PROJ_DIR$\..\..\firmware_common\drivers\interrupts.c}.234.3" 0 0 1 "" 0 "" 0</Bp1>
         <Count>2</Count>
     </Breakpoints2>
+    <TermIOLog>
+        <LoggingEnabled>_ 0</LoggingEnabled>
+        <LogFile>_ ""</LogFile>
+    </TermIOLog>
     <LogFile>
         <LoggingEnabled>_ 0</LoggingEnabled>
         <LogFile>_ ""</LogFile>
@@ -75,8 +79,4 @@
     <CallStackStripe>
         <ShowTiming>1</ShowTiming>
     </CallStackStripe>
-    <TermIOLog>
-        <LoggingEnabled>_ 0</LoggingEnabled>
-        <LogFile>_ ""</LogFile>
-    </TermIOLog>
 </settings>
