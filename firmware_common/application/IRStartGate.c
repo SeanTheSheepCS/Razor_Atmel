@@ -1,22 +1,8 @@
 /*!*********************************************************************************************************************
-@file user_app1.c                                                                
-@brief User's tasks / applications are written here.  This description
-should be replaced by something specific to the task.
-
-----------------------------------------------------------------------------------------------------------------------
-To start a new task using this user_app1 as a template:
- 1. Copy both user_app1.c and user_app1.h to the Application directory
- 2. Rename the files yournewtaskname.c and yournewtaskname.h
- 3. Add yournewtaskname.c and yournewtaskname.h to the Application Include and Source groups in the IAR project
- 4. Use ctrl-h (make sure "Match Case" is checked) to find and replace all instances of "user_app1" with "yournewtaskname"
- 5. Use ctrl-h to find and replace all instances of "UserApp1" with "YourNewTaskName"
- 6. Use ctrl-h to find and replace all instances of "USER_APP1" with "YOUR_NEW_TASK_NAME"
- 7. Add a call to YourNewTaskNameInitialize() in the init section of main
- 8. Add a call to YourNewTaskNameRunActiveState() in the Super Loop section of main
- 9. Update yournewtaskname.h per the instructions at the top of yournewtaskname.h
-10. Delete this text (between the dashed lines) and update the Description below to describe your task
-----------------------------------------------------------------------------------------------------------------------
-
+@file IRStartGate.c                                                                
+@brief Responsible for: 
+          -starting and managing the timer
+          -recieving input from the board attached to the blade dock
 ------------------------------------------------------------------------------------------------------------------------
 GLOBALS
 - NONE
@@ -31,8 +17,8 @@ PUBLIC FUNCTIONS
 - NONE
 
 PROTECTED FUNCTIONS
-- void UserApp1Initialize(void)
-- void UserApp1RunActiveState(void)
+- void IRStartGateInitialize(void)
+- void IRStartGateRunActiveState(void)
 
 
 **********************************************************************************************************************/
@@ -41,10 +27,10 @@ PROTECTED FUNCTIONS
 
 /***********************************************************************************************************************
 Global variable definitions with scope across entire project.
-All Global variable names shall start with "G_<type>UserApp1"
+All Global variable names shall start with "G_<type>IRStartGate"
 ***********************************************************************************************************************/
 /* New variables */
-volatile u32 G_u32UserApp1Flags;                          /*!< @brief Global state flags */
+volatile u32 G_u32IRStartGateFlags;                          /*!< @brief Global state flags */
 
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -57,10 +43,10 @@ extern volatile u32 G_u32ApplicationFlags;                /*!< @brief From main.
 
 /***********************************************************************************************************************
 Global variable definitions with scope limited to this local application.
-Variable names shall start with "UserApp1_<type>" and be declared as static.
+Variable names shall start with "IRStartGate_<type>" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type IRStartGate_pfStateMachine;               /*!< @brief The state machine function pointer */
-//static u32 UserApp1_u32Timeout;                           /*!< @brief Timeout counter used across states */
+//static u32 IRStartGate_u32Timeout;                           /*!< @brief Timeout counter used across states */
 static u8 IRStartGate_au8GenericReadyMessage[] = "Ready!";
 static u8 IRStartGate_au8TimeDisplay[] = "Time: 00:00.000";
 
@@ -77,7 +63,7 @@ Function Definitions
 /*--------------------------------------------------------------------------------------------------------------------*/
 
 /*!--------------------------------------------------------------------------------------------------------------------
-@fn void UserApp1Initialize(void)
+@fn void IRStartGateInitialize(void)
 
 @brief
 Initializes the State Machine and its variables.
@@ -106,11 +92,11 @@ void IRStartGateInitialize(void)
     IRStartGate_pfStateMachine = IRStartGateSM_Error;
   }
 
-} /* end UserApp1Initialize() */
+} /* end IRStartGateInitialize() */
 
   
 /*!----------------------------------------------------------------------------------------------------------------------
-@fn void UserApp1RunActiveState(void)
+@fn void IRStartGateRunActiveState(void)
 
 @brief Selects and runs one iteration of the current state in the state machine.
 
@@ -128,7 +114,7 @@ void IRStartGateRunActiveState(void)
 {
   IRStartGate_pfStateMachine();
 
-} /* end UserApp1RunActiveState */
+} /* end IRStartGateRunActiveState */
 
 static void IRStartGateIncrementTimer()
 {
@@ -187,7 +173,7 @@ static void IRStartGateIncrementTimer()
   {
     IRStartGate_au8TimeDisplay[6] = '0';
   }
-}
+} /* end IRStartGateIncrementTimer */
 
 static void IRStartGateDisplayTimer()
 {
@@ -224,7 +210,7 @@ static void IRStartGateSM_Idle(void)
     IRStartGate_pfStateMachine = IRStartGateSM_TimerActive;
     PinActiveAcknowledge(UPIMO_PIN);
   }
-} /* end UserApp1SM_Idle() */
+} /* end IRStartGateSM_Idle() */
      
 static void IRStartGateSM_TimerActive(void)
 {
@@ -248,9 +234,8 @@ static void IRStartGateSM_TimerActive(void)
     LcdMessage(LINE1_START_ADDR, IRStartGate_au8GenericReadyMessage);
     IRStartGateResetTimer();
     IRStartGate_pfStateMachine = IRStartGateSM_Idle;
-  }
-  
-}
+  } 
+} /* end IRStartGateSM_TimerActive() */
 
 static void IRStartGateSM_ReplyRecieved(void)
 {
@@ -263,7 +248,7 @@ static void IRStartGateSM_ReplyRecieved(void)
 static void IRStartGateSM_Error(void)          
 {
   
-} /* end UserApp1SM_Error() */
+} /* end IRStartGateSM_Error() */
 
 
 

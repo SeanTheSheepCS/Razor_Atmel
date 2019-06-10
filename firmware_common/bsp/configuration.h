@@ -108,8 +108,8 @@ Includes
 #include "debug.h"
 #include "music.h"
 #include "IRStartGate.h"
-#include "user_app2.h"
-#include "user_app3.h"
+#include "ANTMChannel.h"
+#include "ANTSChannel.h"
 
 
 

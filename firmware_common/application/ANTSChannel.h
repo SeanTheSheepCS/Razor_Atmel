@@ -1,22 +1,10 @@
 /*!*********************************************************************************************************************
-@file user_app3.h                                                                
-@brief Header file for user_app3
-
-----------------------------------------------------------------------------------------------------------------------
-To start a new task using this user_app3 as a template:
-1. Follow the instructions at the top of user_app3.c
-2. Use ctrl-h to find and replace all instances of "user_app3" with "yournewtaskname"
-3. Use ctrl-h to find and replace all instances of "UserApp3" with "YourNewTaskName"
-4. Use ctrl-h to find and replace all instances of "USER_APP3" with "YOUR_NEW_TASK_NAME"
-5. Add #include yournewtaskname.h" to configuration.h
-6. Add/update any special configurations required in configuration.h (e.g. peripheral assignment and setup values)
-7. Delete this text (between the dashed lines)
-----------------------------------------------------------------------------------------------------------------------
-
+@file ANTSChannel.h                                                                
+@brief Header file for ANTSChannel
 **********************************************************************************************************************/
 
-#ifndef __USER_APP3_H
-#define __USER_APP3_H
+#ifndef __ANTSCHANNEL_H
+#define __ANTSCHANNEL_H
 
 /**********************************************************************************************************************
 Type Definitions
@@ -35,8 +23,8 @@ Function Declarations
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @protectedsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
-void UserApp3Initialize(void);
-void UserApp3RunActiveState(void);
+void ANTSChannelInitialize(void);
+void ANTSChannelRunActiveState(void);
 
 
 /*------------------------------------------------------------------------------------------------------------------*/
@@ -47,8 +35,8 @@ void UserApp3RunActiveState(void);
 /***********************************************************************************************************************
 State Machine Declarations
 ***********************************************************************************************************************/
-static void UserApp3SM_Idle(void);    
-static void UserApp3SM_Error(void);         
+static void ANTSChannelSM_Idle(void);    
+static void ANTSChannelSM_Error(void);         
 
 
 

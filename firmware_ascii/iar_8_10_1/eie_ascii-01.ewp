@@ -1016,7 +1016,7 @@
                 </option>
                 <option>
                     <name>IlinkTrustzoneImportLibraryOut</name>
-                    <state>###Unitialized###</state>
+                    <state>eie_ascii-01_import_lib.o</state>
                 </option>
                 <option>
                     <name>OILinkExtraOption</name>
@@ -2244,6 +2244,12 @@
         <group>
             <name>Include</name>
             <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\application\ANTMChannel.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\application\ANTSChannel.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\application\debug.h</name>
             </file>
             <file>
@@ -2255,15 +2261,15 @@
             <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\application\music.h</name>
             </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\firmware_common\application\user_app2.h</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\firmware_common\application\user_app3.h</name>
-            </file>
         </group>
         <group>
             <name>Source</name>
+            <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\application\ANTMChannel.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\application\ANTSChannel.c</name>
+            </file>
             <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\application\debug.c</name>
             </file>
@@ -2272,12 +2278,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\application\main.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\firmware_common\application\user_app2.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\firmware_common\application\user_app3.c</name>
             </file>
         </group>
     </group>

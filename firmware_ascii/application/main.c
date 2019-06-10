@@ -72,8 +72,8 @@ void main(void)
 
   /* Application initialization */
   IRStartGateInitialize();
-  UserApp2Initialize();
-  UserApp3Initialize();
+  ANTMChannelInitialize();
+  ANTSChannelInitialize();
 
   
   /* Exit initialization */
@@ -104,8 +104,8 @@ void main(void)
 
     /* Applications */
     IRStartGateRunActiveState();
-    UserApp2RunActiveState();
-    UserApp3RunActiveState();
+    ANTMChannelRunActiveState();
+    ANTSChannelRunActiveState();
     
     /* System sleep until next Systick */
     HEARTBEAT_OFF();
