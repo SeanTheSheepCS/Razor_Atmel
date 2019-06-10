@@ -15,8 +15,8 @@ To start a new task using this user_app1 as a template:
 
 **********************************************************************************************************************/
 
-#ifndef __USER_APP1_H
-#define __USER_APP1_H
+#ifndef __IRSTARTGATE_H
+#define __IRSTARTGATE_H
 
 /**********************************************************************************************************************
 Type Definitions
@@ -35,20 +35,26 @@ Function Declarations
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @protectedsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
-void UserApp1Initialize(void);
-void UserApp1RunActiveState(void);
+void IRStartGateInitialize(void);
+void IRStartGateRunActiveState(void);
 
+void IRStartGateResetTimer(void);
+void IRStartGateIncrementTimer(void);
+void IRStartGateDisplayTimer(void);
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @privatesection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+//private void sendMessage(u8 au8Message[], u8 messageLength);
 
 /***********************************************************************************************************************
 State Machine Declarations
 ***********************************************************************************************************************/
-static void UserApp1SM_Idle(void);    
-static void UserApp1SM_Error(void);         
+static void IRStartGateSM_Idle(void);
+static void IRStartGateSM_TimerActive(void);
+static void IRStartGateSM_ReplyRecieved(void);
+static void IRStartGateSM_Error(void);         
 
 
 
@@ -57,7 +63,7 @@ Constants / Definitions
 **********************************************************************************************************************/
 
 
-#endif /* __USER_APP1_H */
+#endif /* __IRSTARTGATE_H */
 /*--------------------------------------------------------------------------------------------------------------------*/
 /* End of File                                                                                                        */
 /*--------------------------------------------------------------------------------------------------------------------*/

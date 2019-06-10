@@ -33,7 +33,7 @@ typedef struct
 Constants / Definitions
 ***********************************************************************************************************************/
 #define PIN_INIT_MSG_TIMEOUT         (u32)1000     /* Time in ms for init message to send */
-#define PIN_DEBOUNCE_TIME            (u32)10       /* Time in ms for button debouncing */
+#define PIN_DEBOUNCE_TIME            (u32)100       /* Time in ms for button debouncing */
 
 #define GPIOA_PINS (u32)(PA_12_BLADE_UPOMI | PA_11_BLADE_UPIMO)
 #define INPUT_PINS_IN_USE 2

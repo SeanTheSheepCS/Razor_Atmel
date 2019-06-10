@@ -34,8 +34,8 @@ The order of the definitions below must match the order of the definitions provi
 
 static const u32 Pin_au32InputPins[INPUT_PINS_IN_USE] = { PA_12_BLADE_UPOMI , PA_11_BLADE_UPIMO};
 static PinConfigType Pins_asArray[INPUT_PINS_IN_USE] = 
-{{INPUT_ACTIVE_LOW, PIN_PORTA}, /* UPOMI  */
- {INPUT_ACTIVE_LOW, PIN_PORTA}, /* UPIMO  */
+{{INPUT_ACTIVE_HIGH, PIN_PORTA}, /* UPOMI  */
+ {INPUT_ACTIVE_HIGH, PIN_PORTA}, /* UPIMO  */
 };   
 
 void InputPinInitialize(void)
@@ -97,6 +97,10 @@ void InputPinInitialize(void)
   /* Turn on glitch input filtering */
   AT91C_BASE_PIOA->PIO_IFER = u32PortAInterruptMask;
   AT91C_BASE_PIOB->PIO_IFER = u32PortBInterruptMask; 
+  
+  AT91C_BASE_PIOA->PIO_CODR = u32PortAInterruptMask;
+  AT91C_BASE_PIOB->PIO_CODR = u32PortBInterruptMask;
+
   
   /* Read the ISR register to clear all the current flags */
   u32PortAInterruptMask = AT91C_BASE_PIOA->PIO_ISR;
@@ -209,7 +213,12 @@ void InputPinSM_PinActive(void)
         if( Pin_aeNewState[i] != Pin_aeCurrentState[i] )
         {
           Pin_aeCurrentState[i] = Pin_aeNewState[i];
-          if(Pin_aeCurrentState[i] == VOLTAGE_LOW)
+          if(Pin_aeCurrentState[i] == VOLTAGE_LOW && Pins_asArray[i].eActiveState == INPUT_ACTIVE_LOW)
+          {
+            Pin_abNewPress[i] = TRUE;
+            Pin_au32HoldTimeStart[i] = G_u32SystemTime1ms;
+          }
+          else if(Pin_aeCurrentState[i] == VOLTAGE_HIGH && Pins_asArray[i].eActiveState == INPUT_ACTIVE_HIGH)
           {
             Pin_abNewPress[i] = TRUE;
             Pin_au32HoldTimeStart[i] = G_u32SystemTime1ms;
