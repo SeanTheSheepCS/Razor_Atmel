@@ -84,7 +84,7 @@ void IRStartGateInitialize(void)
   /* If good initialization, set state to Idle */
   if( 1 )
   {
-    IRStartGate_pfStateMachine = IRStartGateSM_Idle;
+    IRStartGate_pfStateMachine = IRStartGateSM_GetInitValues;
   }
   else
   {
@@ -211,6 +211,29 @@ static void IRStartGateSM_Idle(void)
     PinActiveAcknowledge(UPIMO_PIN);
   }
 } /* end IRStartGateSM_Idle() */
+
+static void IRStartGateSM_GetInitValues(void)
+{
+  static bool gotStartOrFinishGateStatus = FALSE;
+  static bool gotAntMChannelFrequency = FALSE;
+  static bool gotAntSChannelFrequency = FALSE;
+  static u8   au8StartOrFinishStatusMessage[]  = "GATE: START";
+  static u8   u8StartIsZeroFinishIsOne         = 0;
+  static u8   au8AntMChannelFrequencyMessage[] = "MFREQ: 50";
+  static u8   u8AntMChannelFrequency           = 50;
+  static u8   au8AntSChannelFrequencyMessage[] = "SFREQ: 50";
+  static u8   u8AntSChannelFrequency           = 50;
+  
+  /* FOR A FUTURE FEATURE, just go to idle for now. */
+  IRStartGate_pfStateMachine = IRStartGateSM_Idle;
+  
+  /*
+  if(gotStartOrFinishStatus == FALSE)
+  {
+    LcdMessage(LINE1_START_ADDR, au8StartOrFinishStatusMessage);
+  }
+  */
+}
      
 static void IRStartGateSM_TimerActive(void)
 {
@@ -233,6 +256,7 @@ static void IRStartGateSM_TimerActive(void)
     LcdCommand(LCD_CLEAR_CMD);
     LcdMessage(LINE1_START_ADDR, IRStartGate_au8GenericReadyMessage);
     IRStartGateResetTimer();
+    LedOff(GREEN);
     IRStartGate_pfStateMachine = IRStartGateSM_Idle;
   } 
 } /* end IRStartGateSM_TimerActive() */

@@ -138,7 +138,7 @@
                     <item>TWI_psMsgBufferCurrent</item>
                     <item>TWI_psMsgBufferNext</item>
                     <item>TWI_asMessageBuffer</item>
-                    <item></item>
+                    <item />
                 </expressions>
                 <col-names>
                     <item>Expression</item>

@@ -57,7 +57,7 @@ void main(void)
 
   /* Debug messages through DebugPrintf() are available from here */
   ButtonInitialize();
-  InputPinInitialize();
+  //InputPinInitialize();
   TimerInitialize();  
   SpiInitialize();
   SspInitialize();
@@ -71,9 +71,9 @@ void main(void)
   SdCardInitialize();
 
   /* Application initialization */
-  IRStartGateInitialize();
-  ANTMChannelInitialize();
-  ANTSChannelInitialize();
+  //IRStartGateInitialize();
+  //ANTMChannelInitialize();
+  //ANTSChannelInitialize();
 
   
   /* Exit initialization */
@@ -88,7 +88,7 @@ void main(void)
     /* Drivers */
     LedUpdate();
     ButtonRunActiveState();
-    InputPinRunActiveState();
+    //InputPinRunActiveState();
     UartRunActiveState();
     TimerRunActiveState(); 
     SpiRunActiveState();
@@ -103,9 +103,9 @@ void main(void)
     SdCardRunActiveState();
 
     /* Applications */
-    IRStartGateRunActiveState();
-    ANTMChannelRunActiveState();
-    ANTSChannelRunActiveState();
+    //IRStartGateRunActiveState();
+    //ANTMChannelRunActiveState();
+    //ANTSChannelRunActiveState();
     
     /* System sleep until next Systick */
     HEARTBEAT_OFF();

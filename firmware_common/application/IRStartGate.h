@@ -38,6 +38,7 @@ void IRStartGateDisplayTimer(void);
 State Machine Declarations
 ***********************************************************************************************************************/
 static void IRStartGateSM_Idle(void);
+static void IRStartGateSM_GetInitValues(void);
 static void IRStartGateSM_TimerActive(void);
 static void IRStartGateSM_ReplyRecieved(void);
 static void IRStartGateSM_Error(void);         
