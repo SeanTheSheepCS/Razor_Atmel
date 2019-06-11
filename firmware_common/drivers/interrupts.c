@@ -211,7 +211,7 @@ void PIOA_IrqHandler(void)
       }
     }
   } /* end button interrupt checking */
-  //
+  
   u32PinInterrupts = u32GPIOInterruptSources & GPIOA_PINS;
   if(u32PinInterrupts)
   {

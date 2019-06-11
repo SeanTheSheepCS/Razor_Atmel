@@ -90,7 +90,7 @@ Includes
 #include "debug.h"
 #include "music.h"
 #include "ir_gate_app.h"
-#include "user_app2.h"
+#include "ant_m_channel.h"
 #include "user_app3.h"
 
 

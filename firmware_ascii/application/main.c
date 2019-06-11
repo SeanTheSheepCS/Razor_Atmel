@@ -73,7 +73,7 @@ void main(void)
   /* Application initialization */
 
   IrGateInitialize();
-  UserApp2Initialize();
+  ANTMChannelInitialize();
   UserApp3Initialize();
 
   
@@ -104,7 +104,7 @@ void main(void)
 
     /* Applications */
     IrGateRunActiveState();
-    UserApp2RunActiveState();
+    ANTMChannelRunActiveState();
     UserApp3RunActiveState();
     
     /* System sleep*/
