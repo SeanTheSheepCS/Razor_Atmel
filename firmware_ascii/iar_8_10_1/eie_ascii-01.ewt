@@ -2438,6 +2438,9 @@
                 <name>$PROJ_DIR$\..\..\firmware_common\drivers\exceptions.h</name>
             </file>
             <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\drivers\input_pins.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\drivers\interrupts.h</name>
             </file>
             <file>
@@ -2484,6 +2487,9 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\drivers\exceptions.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\drivers\input_pins.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\drivers\interrupts.c</name>

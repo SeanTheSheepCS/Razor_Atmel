@@ -58,7 +58,6 @@ Global variable definitions with scope limited to this local application.
 Variable names shall start with "UserApp1_" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type UserApp1_StateMachine;            /* The state machine function pointer */
-static u8 au8SnakeBlocks[][];
 
 /**********************************************************************************************************************
 Function Definitions
@@ -138,29 +137,6 @@ State Machine Function Definitions
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Wait for ??? */
 static void UserApp1SM_Idle(void)
-{
-  static u32 u32Counter = 0;
-  static bool isLightOn = FALSE;
-  
-  
-  if(u32Counter >= COUNTER_LIMIT_MS)
-  {
-    if(isLightOn)
-    {
-      LedOff(BLUE1);
-      isLightOn = FALSE;
-    }
-    else
-    {
-      LedOn(BLUE1);
-      isLightOn = TRUE;
-    }
-    u32Counter = 0;
-  }
-  u32Counter++;
-} /* end UserApp1SM_Idle() */
-
-static void renderSnake()
 {
   
 }

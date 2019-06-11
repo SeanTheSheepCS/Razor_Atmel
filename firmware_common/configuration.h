@@ -56,6 +56,7 @@ Includes
 #include "ant.h"
 #include "ant_api.h"
 #include "buttons.h"
+#include "input_pins.h"
 #include "leds.h" 
 #include "messaging.h"
 #include "timer.h" 
@@ -117,9 +118,10 @@ Includes
 /* MPGL2 specific application flags */
 #define _APPLICATION_FLAGS_CAPTOUCH     0x00000080        /* CapTouchStateMachine */
 
-#define NUMBER_APPLICATIONS             (u8)8             /* Total number of applications */
+#define NUMBER_APPLICATIONS             (u8)9             /* Total number of applications */
 #endif /* MPGL2 specific application flags */
 
+#define _APPLICATION_FLAGS_PIN          0x00000100
 
 /**********************************************************************************************************************
 !!!!! External device peripheral assignments
