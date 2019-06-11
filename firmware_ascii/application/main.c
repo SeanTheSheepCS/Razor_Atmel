@@ -104,6 +104,8 @@ void main(void)
 
     /* Applications */
     IrGateRunActiveState();
+    
+    /* ANT message */
     ANTMChannelRunActiveState();
     ANTSChannelRunActiveState();
     

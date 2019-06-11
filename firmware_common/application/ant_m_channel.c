@@ -39,9 +39,10 @@ extern volatile u32 G_u32SystemTime1s;                           /*!< @brief Fro
 extern volatile u32 G_u32SystemFlags;                            /*!< @brief From main.c */
 extern volatile u32 G_u32ApplicationFlags;                       /*!< @brief From main.c */
 
-extern u32 G_u32AntApiCurrentDataTimeStamp;                      /* From ant_api.c */
-extern AntApplicationMessageType G_eAntApiCurrentMessageClass;   /* From ant_api.c */
+extern u32 G_u32AntApiCurrentDataTimeStamp;                              /* From ant_api.c */
+extern AntApplicationMessageType G_eAntApiCurrentMessageClass;           /* From ant_api.c */
 extern u8 G_au8AntApiCurrentMessageBytes[ANT_APPLICATION_MESSAGE_BYTES]; /* From ant_api.c */
+extern AntExtendedDataType G_sAntApiCurrentMessageExtData;               /* From ant_api.c */
 
 
 /***********************************************************************************************************************
@@ -154,19 +155,17 @@ static void ANTMChannelSM_Idle(void)
   {
     au8Message[i] = G_au8ANTMChannelMessageToSend[i];
   }
-  LedOn(BLUE);
   if(AntReadAppMessageBuffer())
   {
     if(G_eAntApiCurrentMessageClass == ANT_DATA)
     {
-      
+      AntQueueBroadcastMessage(ANT_CHANNEL_MCHANNEL, au8Message);
     }
     else if(G_eAntApiCurrentMessageClass == ANT_TICK)
     {
       AntQueueBroadcastMessage(ANT_CHANNEL_MCHANNEL, au8Message);
     }
   }
-  
 } /* end ANTMChannelSM_Idle() */
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -224,6 +223,7 @@ static void ANTMChannelSM_WaitChannelOpen(void)
   if(AntRadioStatusChannel(ANT_CHANNEL_MCHANNEL) == ANT_OPEN)
   {
     DebugPrintf("Successfully opened master channel.");
+    LedOn(PURPLE);
     DebugLineFeed();
     ANTMChannel_pfStateMachine = ANTMChannelSM_Idle;
   }

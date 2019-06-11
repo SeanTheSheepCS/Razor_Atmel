@@ -42,6 +42,7 @@ extern volatile u32 G_u32ApplicationFlags;                       /*!< @brief Fro
 extern u32 G_u32AntApiCurrentDataTimeStamp;                              /* From ant_api.c */
 extern AntApplicationMessageType G_eAntApiCurrentMessageClass;           /* From ant_api.c */
 extern u8 G_au8AntApiCurrentMessageBytes[ANT_APPLICATION_MESSAGE_BYTES]; /* From ant_api.c */
+extern AntExtendedDataType G_sAntApiCurrentMessageExtData;               /* From ant_api.c */
 
 
 /***********************************************************************************************************************
@@ -158,16 +159,15 @@ static void ANTSChannelSM_Idle(void)
         G_au8ANTSChannelMessageRecieved[i] = G_au8AntApiCurrentMessageBytes[i];
         if(G_au8ANTSChannelMessageRecieved[0] == 0x90)
         {
-          LedOn(PURPLE);
+          LedOn(ORANGE);
         }
       }
     }
     else if(G_eAntApiCurrentMessageClass == ANT_TICK)
     {
-      
+      //
     }
   }
-  
 } /* end ANTSChannelSM_Idle() */
 
 /*-------------------------------------------------------------------------------------------------------------------*/
@@ -225,6 +225,7 @@ static void ANTSChannelSM_WaitChannelOpen(void)
   if(AntRadioStatusChannel(ANT_CHANNEL_SCHANNEL) == ANT_OPEN)
   {
     DebugPrintf("Successfully opened slave channel.");
+    LedOn(BLUE);
     DebugLineFeed();
     ANTSChannel_pfStateMachine = ANTSChannelSM_Idle;
   }
