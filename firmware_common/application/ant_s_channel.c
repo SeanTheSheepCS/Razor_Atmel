@@ -152,6 +152,8 @@ static void ANTSChannelSM_Idle(void)
 {
   if(AntReadAppMessageBuffer())
   {
+    DebugPrintf("Slave channel has read a message.");
+    DebugLineFeed();
     if(G_eAntApiCurrentMessageClass == ANT_DATA)
     {
       for(u8 i = 0; i < 8; i++)

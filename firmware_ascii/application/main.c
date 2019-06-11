@@ -106,8 +106,8 @@ void main(void)
     IrGateRunActiveState();
     
     /* ANT message */
-    ANTMChannelRunActiveState();
     ANTSChannelRunActiveState();
+    ANTMChannelRunActiveState();
     
     /* System sleep*/
     HEARTBEAT_OFF();

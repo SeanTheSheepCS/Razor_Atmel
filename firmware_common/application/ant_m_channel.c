@@ -157,6 +157,8 @@ static void ANTMChannelSM_Idle(void)
   }
   if(AntReadAppMessageBuffer())
   {
+    DebugPrintf("Master channel has read a message.");
+    DebugLineFeed();
     if(G_eAntApiCurrentMessageClass == ANT_DATA)
     {
       AntQueueBroadcastMessage(ANT_CHANNEL_MCHANNEL, au8Message);
