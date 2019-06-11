@@ -43,12 +43,14 @@ extern volatile u32 G_u32ApplicationFlags;                /*!< @brief From main.
 
 /***********************************************************************************************************************
 Global variable definitions with scope limited to this local application.
-Variable names shall start with "IRStartGate_<type>" and be declared as static.
+Variable names shall start with "IrGate_<type>" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type IrGate_pfStateMachine;               /*!< @brief The state machine function pointer */
 //static u32 IrGate_u32Timeout;                           /*!< @brief Timeout counter used across states */
 static u8 IrGate_au8GenericReadyMessage[] = "Ready!";
 static u8 IrGate_au8TimeDisplay[] = "Time: 00:00.000";
+static u8* IrGate_au8ModeDisplay = "Mode: START";
+static GateMode IrGate_gmCurrentMode = GATE_MODE_START;
 
 /**********************************************************************************************************************
 Function Definitions
@@ -81,10 +83,11 @@ void IrGateInitialize(void)
 {
   LCDCommand(LCD_CLEAR_CMD);
   LCDMessage(LINE1_START_ADDR, IrGate_au8GenericReadyMessage);
+  LCDMessage(LINE2_START_ADDR, IrGate_au8ModeDisplay);
   /* If good initialization, set state to Idle */
   if( 1 )
   {
-    IrGate_pfStateMachine = IrGateSM_GetInitValues;
+    IrGate_pfStateMachine = IrGateSM_Idle;
   }
   else
   {
@@ -197,6 +200,26 @@ static void IrGateResetTimer()
 /*! @privatesection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
 
+void CycleMode()
+{
+  if(IrGate_gmCurrentMode == GATE_MODE_START)
+  {
+    IrGate_au8ModeDisplay = "Mode: INTERMEDIATE";
+    IrGate_gmCurrentMode = GATE_MODE_INTERMEDIATE;
+  }
+  else if(IrGate_gmCurrentMode == GATE_MODE_INTERMEDIATE)
+  {
+    IrGate_au8ModeDisplay = "Mode: FINISH";
+    IrGate_gmCurrentMode = GATE_MODE_FINISH;
+  }
+  else if(IrGate_gmCurrentMode == GATE_MODE_FINISH)
+  {
+    IrGate_au8ModeDisplay = "Mode: START";
+    IrGate_gmCurrentMode = GATE_MODE_START;
+  }
+  LCDClearChars(LINE2_START_ADDR, 18);
+  LCDMessage(LINE2_START_ADDR, IrGate_au8ModeDisplay);
+}
 
 /**********************************************************************************************************************
 State Machine Function Definitions
@@ -205,35 +228,17 @@ State Machine Function Definitions
 /* What does this state do? */
 static void IrGateSM_Idle(void)
 {
+  if(WasButtonPressed(BUTTON3))
+  {
+    ButtonAcknowledge(BUTTON3);
+    CycleMode();
+  }
   if(HasThePinBeenActivated(UPIMO_PIN))
   {
     IrGate_pfStateMachine = IrGateSM_TimerActive;
     PinActiveAcknowledge(UPIMO_PIN);
   }
 } /* end IRStartGateSM_Idle() */
-
-static void IrGateSM_GetInitValues(void)
-{
-  static bool gotStartOrFinishGateStatus = FALSE;
-  static bool gotAntMChannelFrequency = FALSE;
-  static bool gotAntSChannelFrequency = FALSE;
-  static u8   au8StartOrFinishStatusMessage[]  = "GATE: START";
-  static u8   u8StartIsZeroFinishIsOne         = 0;
-  static u8   au8AntMChannelFrequencyMessage[] = "MFREQ: 50";
-  static u8   u8AntMChannelFrequency           = 50;
-  static u8   au8AntSChannelFrequencyMessage[] = "SFREQ: 50";
-  static u8   u8AntSChannelFrequency           = 50;
-  
-  /* FOR A FUTURE FEATURE, just go to idle for now. */
-  IrGate_pfStateMachine = IrGateSM_Idle;
-  
-  /*
-  if(gotStartOrFinishStatus == FALSE)
-  {
-    LcdMessage(LINE1_START_ADDR, au8StartOrFinishStatusMessage);
-  }
-  */
-}
      
 static void IrGateSM_TimerActive(void)
 {
