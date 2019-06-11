@@ -165,7 +165,7 @@ static void ANTSChannelSM_Idle(void)
         G_au8ANTSChannelMessageRecieved[i] = G_au8AntApiCurrentMessageBytes[i];
         if(G_au8ANTSChannelMessageRecieved[0] == 0x90)
         {
-          LedOn(GREEN);
+          LedOn(CYAN);
         }
       }
     }

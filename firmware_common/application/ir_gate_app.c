@@ -181,7 +181,7 @@ static void IrGateIncrementTimer()
 
 static void IrGateDisplayTimer()
 {
-  LCDClearChars(LINE1_START_ADDR, 15);
+  LCDClearChars(LINE1_START_ADDR, 20);
   LCDMessage(LINE1_START_ADDR, IrGate_au8TimeDisplay);
 }
 
