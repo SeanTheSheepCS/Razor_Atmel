@@ -138,6 +138,10 @@ void ANTSChannelRunActiveState(void)
 
 } /* end ANTSChannelRunActiveState */
 
+void ANTSChannelSetAntFrequency(u8 newFrequency)
+{
+  ANTSChannel_sChannelInfo.AntFrequency = newFrequency;
+}
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @privatesection */                                                                                            
@@ -161,7 +165,7 @@ static void ANTSChannelSM_Idle(void)
         G_au8ANTSChannelMessageRecieved[i] = G_au8AntApiCurrentMessageBytes[i];
         if(G_au8ANTSChannelMessageRecieved[0] == 0x90)
         {
-          LedOn(ORANGE);
+          LedOn(GREEN);
         }
       }
     }
@@ -227,7 +231,14 @@ static void ANTSChannelSM_WaitChannelOpen(void)
   if(AntRadioStatusChannel(ANT_CHANNEL_SCHANNEL) == ANT_OPEN)
   {
     DebugPrintf("Successfully opened slave channel.");
-    LedOn(BLUE);
+    if(ANTSChannel_sChannelInfo.AntFrequency == 11)
+    {
+      LedOn(BLUE);
+    }
+    else if(ANTSChannel_sChannelInfo.AntFrequency == 91)
+    {
+      LedOn(RED);
+    }
     DebugLineFeed();
     ANTSChannel_pfStateMachine = ANTSChannelSM_Idle;
   }

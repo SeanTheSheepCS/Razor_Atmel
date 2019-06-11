@@ -25,7 +25,7 @@ Function Declarations
 /*--------------------------------------------------------------------------------------------------------------------*/
 void ANTMChannelInitialize(void);
 void ANTMChannelRunActiveState(void);
-
+void ANTMChannelSetAntFrequency(u8 newFrequency);
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @privatesection */                                                                                            
@@ -40,7 +40,6 @@ static void ANTMChannelSM_WaitForButtonPressForConfiguation(void);
 static void ANTMChannelSM_WaitForConfiguration(void);
 static void ANTMChannelSM_WaitForButtonPressToOpenChannel(void);
 static void ANTMChannelSM_WaitChannelOpen(void);
-
 
 /**********************************************************************************************************************
 Constants / Definitions

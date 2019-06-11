@@ -1,8 +1,8 @@
 /*!*********************************************************************************************************************
-@file IrGatepp.c                                                                
+@file ant_commands.c                                                                
 @brief Responsible for: 
-          -starting and managing the timer
-          -recieving input from the board attached to the blade dock
+          -checking what ANT command a message corresponds to
+          -giving out ANT messages that mean certain commands to other files
 ------------------------------------------------------------------------------------------------------------------------
 GLOBALS
 - NONE
@@ -17,7 +17,9 @@ PUBLIC FUNCTIONS
 - NONE
 
 PROTECTED FUNCTIONS
-- u8 messageToAntCommand(u8 au8Message[])
+- u8 AntCommand_MessageToAntCommand(u8 au8Message[])
+- u8* AntCommand_GetBeginTimerAntMessage()
+- u8* AntCommand_GetEndTimerAntMessage()
 
 
 **********************************************************************************************************************/
@@ -35,7 +37,8 @@ Function Definitions
 /*--------------------------------------------------------------------------------------------------------------------*/
 /*! @protectedsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
-u8 messageToAntCommand(u8 au8Message[])
+
+u8 AntCommand_MessageToAntCommand(u8 au8Message[])
 {
   static u8 au8BeginMessage[] = ANT_MESSAGE_BEGIN_TIMER;
   static u8 au8EndMessage[] = ANT_MESSAGE_END_TIMER;
@@ -62,6 +65,19 @@ u8 messageToAntCommand(u8 au8Message[])
   }
   return ANT_COMMAND_INVALID;
 }
+
+u8* AntCommand_GetBeginTimerAntMessage()
+{
+  static u8 u8pAddressOfBeginTimerMessage[] = ANT_MESSAGE_BEGIN_TIMER;
+  return &(u8pAddressOfBeginTimerMessage[0]);
+}
+
+u8* AntCommand_GetEndTimerAntMessage()
+{
+  static u8 u8pAddressOfEndTimerMessage[] = ANT_MESSAGE_END_TIMER;
+  return &(u8pAddressOfEndTimerMessage[0]);
+}
+
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @privatesection */                                                                                            

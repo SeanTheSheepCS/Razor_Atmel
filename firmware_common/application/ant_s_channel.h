@@ -25,7 +25,7 @@ Function Declarations
 /*--------------------------------------------------------------------------------------------------------------------*/
 void ANTSChannelInitialize(void);
 void ANTSChannelRunActiveState(void);
-
+void ANTSChannelSetAntFrequency(u8 newFrequency);
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @privatesection */                                                                                            

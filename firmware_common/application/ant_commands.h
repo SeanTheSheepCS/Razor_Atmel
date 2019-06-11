@@ -13,7 +13,9 @@ Function Declarations
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @protectedsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
-u8 messageToAntCommand(u8 au8Message[]);
+u8 AntCommand_MessageToAntCommand(u8 au8Message[]);
+u8* AntCommand_GetBeginTimerAntMessage(void);
+u8* AntCommand_GetEndTimerAntMessage(void);
 
 /**********************************************************************************************************************
 Constants / Definitions

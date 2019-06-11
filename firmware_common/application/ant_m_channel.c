@@ -116,6 +116,10 @@ void ANTMChannelInitialize(void)
 
 } /* end ANTMChannelInitialize() */
 
+void ANTMChannelSetAntFrequency(u8 newFrequency)
+{
+  ANTMChannel_sChannelInfo.AntFrequency = newFrequency;
+}
   
 /*!----------------------------------------------------------------------------------------------------------------------
 @fn void ANTMChannelRunActiveState(void)
@@ -225,7 +229,14 @@ static void ANTMChannelSM_WaitChannelOpen(void)
   if(AntRadioStatusChannel(ANT_CHANNEL_MCHANNEL) == ANT_OPEN)
   {
     DebugPrintf("Successfully opened master channel.");
-    LedOn(PURPLE);
+    if(ANTMChannel_sChannelInfo.AntFrequency == 11)
+    {
+      LedOn(PURPLE);
+    }
+    else if(ANTMChannel_sChannelInfo.AntFrequency == 91)
+    {
+      LedOn(ORANGE);
+    }
     DebugLineFeed();
     ANTMChannel_pfStateMachine = ANTMChannelSM_Idle;
   }

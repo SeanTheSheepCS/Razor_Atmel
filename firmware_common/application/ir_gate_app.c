@@ -47,7 +47,8 @@ Variable names shall start with "IrGate_<type>" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type IrGate_pfStateMachine;               /*!< @brief The state machine function pointer */
 //static u32 IrGate_u32Timeout;                           /*!< @brief Timeout counter used across states */
-static u8 IrGate_au8GenericReadyMessage[] = "Ready!";
+static u8* IrGate_au8ReadyMessageWithTeam = "Ready For RED Team!";
+static Team IrGate_tTeam = RED_TEAM;
 static u8 IrGate_au8TimeDisplay[] = "Time: 00:00.000";
 static u8* IrGate_au8ModeDisplay = "Mode: START";
 static GateMode IrGate_gmCurrentMode = GATE_MODE_START;
@@ -82,7 +83,7 @@ Promises:
 void IrGateInitialize(void)
 {
   LCDCommand(LCD_CLEAR_CMD);
-  LCDMessage(LINE1_START_ADDR, IrGate_au8GenericReadyMessage);
+  LCDMessage(LINE1_START_ADDR, IrGate_au8ReadyMessageWithTeam);
   LCDMessage(LINE2_START_ADDR, IrGate_au8ModeDisplay);
   /* If good initialization, set state to Idle */
   if( 1 )
@@ -221,6 +222,26 @@ void CycleMode()
   LCDMessage(LINE2_START_ADDR, IrGate_au8ModeDisplay);
 }
 
+void CycleTeam()
+{
+  if(IrGate_tTeam == RED_TEAM)
+  {
+    IrGate_au8ReadyMessageWithTeam = "Ready For BLUE Team!";
+    IrGate_tTeam = BLUE_TEAM;
+    ANTMChannelSetAntFrequency(11);
+    ANTSChannelSetAntFrequency(11);
+  }
+  else if(IrGate_tTeam == BLUE_TEAM)
+  {
+    IrGate_au8ReadyMessageWithTeam = "Ready For RED Team!";
+    IrGate_tTeam = RED_TEAM;
+    ANTMChannelSetAntFrequency(91);
+    ANTSChannelSetAntFrequency(91);
+  }
+  LCDClearChars(LINE1_START_ADDR, 20);
+  LCDMessage(LINE1_START_ADDR, IrGate_au8ReadyMessageWithTeam);
+}
+
 /**********************************************************************************************************************
 State Machine Function Definitions
 **********************************************************************************************************************/
@@ -228,16 +249,25 @@ State Machine Function Definitions
 /* What does this state do? */
 static void IrGateSM_Idle(void)
 {
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    CycleTeam();
+  }
   if(WasButtonPressed(BUTTON3))
   {
     ButtonAcknowledge(BUTTON3);
     CycleMode();
   }
-  if(HasThePinBeenActivated(UPIMO_PIN))
+  else if(HasThePinBeenActivated(UPIMO_PIN) && IrGate_gmCurrentMode == GATE_MODE_START)
   {
     IrGate_pfStateMachine = IrGateSM_TimerActive;
     PinActiveAcknowledge(UPIMO_PIN);
   }
+  //else if( /* GOT AN ANT MESSAGE THAT WAS A START TIMER COMMAND */)
+  //{
+  //  
+  //}
 } /* end IRStartGateSM_Idle() */
      
 static void IrGateSM_TimerActive(void)
@@ -258,8 +288,8 @@ static void IrGateSM_TimerActive(void)
   }
   if(IsButtonPressed(BUTTON0))
   {
-    LCDCommand(LCD_CLEAR_CMD);
-    LCDMessage(LINE1_START_ADDR, IrGate_au8GenericReadyMessage);
+    LCDClearChars(LINE1_START_ADDR, 20);
+    LCDMessage(LINE1_START_ADDR, IrGate_au8ReadyMessageWithTeam);
     IrGateResetTimer();
     LedOff(GREEN);
     IrGate_pfStateMachine = IrGateSM_Idle;
