@@ -58,6 +58,7 @@ void main(void)
   /* Debug messages through DebugPrintf() are available from here */
 
   ButtonInitialize();
+  InputPinInitialize();
   TimerInitialize();  
   SspInitialize();
   TWIInitialize();
@@ -71,7 +72,7 @@ void main(void)
 
   /* Application initialization */
 
-  UserApp1Initialize();
+  IrGateInitialize();
   UserApp2Initialize();
   UserApp3Initialize();
 
@@ -88,6 +89,7 @@ void main(void)
     /* Drivers */
     LedUpdate();
     ButtonRunActiveState();
+    InputPinRunActiveState();
     UartRunActiveState();
     TimerRunActiveState(); 
     SspRunActiveState();
@@ -101,7 +103,7 @@ void main(void)
     SdCardRunActiveState();
 
     /* Applications */
-    UserApp1RunActiveState();
+    IrGateRunActiveState();
     UserApp2RunActiveState();
     UserApp3RunActiveState();
     

@@ -21,8 +21,10 @@ extern volatile u32 G_u32SystemTime1s;                             /* From board
 
 extern volatile u32 G_u32SystemFlags;                              /* From main.c       */
 
-extern volatile bool G_abButtonDebounceActive[TOTAL_BUTTONS];      /* From buttons.c    */
-extern volatile u32 G_au32ButtonDebounceTimeStart[TOTAL_BUTTONS];  /* From buttons.c    */
+extern volatile bool G_abButtonDebounceActive[TOTAL_BUTTONS];      /*!<@brief  From buttons.c    */
+extern volatile u32 G_au32ButtonDebounceTimeStart[TOTAL_BUTTONS];  /*!<@brief  From buttons.c    */
+extern volatile bool G_abPinDebounceActive[INPUT_PINS_IN_USE];      /*!<@brief  From input_pins.c    */
+extern volatile u32 G_au32PinDebounceTimeStart[INPUT_PINS_IN_USE];  /*!<@brief  From input_pins.c    */
 
 
 /***********************************************************************************************************************
@@ -178,8 +180,10 @@ void PIOA_IrqHandler(void)
 {
   u32 u32GPIOInterruptSources;
   u32 u32ButtonInterrupts;
+  u32 u32PinInterrupts;
   u32 u32CurrentButtonLocation;
-
+  u32 u32CurrentPinLocation;
+  
   /* Grab a snapshot of the current PORTA status flags (clears all flags) */
   u32GPIOInterruptSources  = AT91C_BASE_PIOA->PIO_ISR;
 
@@ -188,7 +192,6 @@ void PIOA_IrqHandler(void)
   
   /* Examine button interrupts */
   u32ButtonInterrupts = u32GPIOInterruptSources & GPIOA_BUTTONS;
-  
   /* Check if any port A buttons interrupted */
   if(u32ButtonInterrupts)
   {
@@ -209,10 +212,26 @@ void PIOA_IrqHandler(void)
     }
   } /* end button interrupt checking */
   
+  u32PinInterrupts = u32GPIOInterruptSources & GPIOA_PINS;
+  if(u32PinInterrupts)
+  {
+    for(u8 i = 0; i < INPUT_PINS_IN_USE; i++)
+    {
+      u32CurrentPinLocation = GetPinBitLocation(i, PIN_PORTA);
+      if(u32PinInterrupts & u32CurrentPinLocation)
+      {
+        AT91C_BASE_PIOA->PIO_IDR |= u32CurrentPinLocation;
+        G_abPinDebounceActive[i] = TRUE;
+        G_au32PinDebounceTimeStart[i] = G_u32SystemTime1ms;
+      }
+    }
+  }
+  
   /* Clear the PIOA pending flag and exit */
   NVIC_ClearPendingIRQ(IRQn_PIOA);
   
 } /* end PIOA_IrqHandler() */
+
 
 
 /*----------------------------------------------------------------------------------------------------------------------
