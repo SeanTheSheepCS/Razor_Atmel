@@ -103,9 +103,9 @@ void ANTSChannelInitialize(void)
   
   
   /* If good initialization, set state to Idle */
-  if(AntAssignChannel(&ANTSChannel_sChannelInfo))
+  if(1)
   {
-    ANTSChannel_pfStateMachine = ANTSChannelSM_WaitForButtonPressToOpenChannel;
+    ANTSChannel_pfStateMachine = ANTSChannelSM_WaitForButtonPressForConfiguation;
   }
   else
   {
@@ -177,12 +177,43 @@ static void ANTSChannelSM_Error(void)
   
 } /* end ANTSChannelSM_Error() */
 
+static void ANTSChannelSM_WaitForButtonPressForConfiguation(void)
+{
+  if(WasButtonPressed(BUTTON2))
+  {
+    ButtonAcknowledge(BUTTON2);
+    AntAssignChannel(&ANTSChannel_sChannelInfo);
+    DebugPrintf("Attempting to configure slave channel...");
+    DebugLineFeed();
+    ANTSChannel_pfStateMachine = ANTSChannelSM_WaitForConfiguration;
+    ANTSChannel_u32Timeout = G_u32SystemTime1ms;
+  }
+}
+
+static void ANTSChannelSM_WaitForConfiguration(void)
+{
+  if(AntRadioStatusChannel(ANT_CHANNEL_SCHANNEL) == ANT_CONFIGURED)
+  {
+    DebugPrintf("Successfully configured slave channel.");
+    DebugLineFeed();
+    ANTSChannel_pfStateMachine = ANTSChannelSM_WaitForButtonPressToOpenChannel;
+  }
+  
+  if(IsTimeUp(&ANTSChannel_u32Timeout, 3000))
+  {
+    DebugPrintf("Failed to configure slave channel.");
+    DebugLineFeed();
+    ANTSChannel_pfStateMachine = ANTSChannelSM_Error;
+  }
+}
+
 static void ANTSChannelSM_WaitForButtonPressToOpenChannel(void)
 {
   if(WasButtonPressed(BUTTON2))
   {
     ButtonAcknowledge(BUTTON2);
     DebugPrintf("Attempting to open slave channel...");
+    DebugLineFeed();
     ANTSChannel_pfStateMachine = ANTSChannelSM_WaitChannelOpen;
     AntOpenChannelNumber(ANT_CHANNEL_SCHANNEL);
     ANTSChannel_u32Timeout = G_u32SystemTime1ms;
@@ -194,12 +225,14 @@ static void ANTSChannelSM_WaitChannelOpen(void)
   if(AntRadioStatusChannel(ANT_CHANNEL_SCHANNEL) == ANT_OPEN)
   {
     DebugPrintf("Successfully opened slave channel.");
+    DebugLineFeed();
     ANTSChannel_pfStateMachine = ANTSChannelSM_Idle;
   }
   
   if(IsTimeUp(&ANTSChannel_u32Timeout, 3000))
   {
     DebugPrintf("Failed to open slave channel.");
+    DebugLineFeed();
     ANTSChannel_pfStateMachine = ANTSChannelSM_Error;
   }
 }

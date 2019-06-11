@@ -103,9 +103,9 @@ void ANTMChannelInitialize(void)
   
   
   /* If good initialization, set state to Idle */
-  if(AntAssignChannel(&ANTMChannel_sChannelInfo))
+  if(1)
   {
-    ANTMChannel_pfStateMachine = ANTMChannelSM_WaitForButtonPressToOpenChannel;
+    ANTMChannel_pfStateMachine = ANTMChannelSM_WaitForButtonPressForConfiguation;
   }
   else
   {
@@ -176,12 +176,43 @@ static void ANTMChannelSM_Error(void)
   
 } /* end ANTMChannelSM_Error() */
 
+static void ANTMChannelSM_WaitForButtonPressForConfiguation(void)
+{
+  if(WasButtonPressed(BUTTON1))
+  {
+    ButtonAcknowledge(BUTTON1);
+    AntAssignChannel(&ANTMChannel_sChannelInfo);
+    DebugPrintf("Attempting to configure master channel...");
+    DebugLineFeed();
+    ANTMChannel_pfStateMachine = ANTMChannelSM_WaitForConfiguration;
+    ANTMChannel_u32Timeout = G_u32SystemTime1ms;
+  }
+}
+
+static void ANTMChannelSM_WaitForConfiguration(void)
+{
+  if(AntRadioStatusChannel(ANT_CHANNEL_MCHANNEL) == ANT_CONFIGURED)
+  {
+    DebugPrintf("Successfully configured master channel.");
+    DebugLineFeed();
+    ANTMChannel_pfStateMachine = ANTMChannelSM_WaitForButtonPressToOpenChannel;
+  }
+  
+  if(IsTimeUp(&ANTMChannel_u32Timeout, 3000))
+  {
+    DebugPrintf("Failed to configure master channel.");
+    DebugLineFeed();
+    ANTMChannel_pfStateMachine = ANTMChannelSM_Error;
+  }
+}
+
 static void ANTMChannelSM_WaitForButtonPressToOpenChannel(void)
 {
   if(WasButtonPressed(BUTTON1))
   {
     ButtonAcknowledge(BUTTON1);
     DebugPrintf("Attempting to open master channel...");
+    DebugLineFeed();
     ANTMChannel_pfStateMachine = ANTMChannelSM_WaitChannelOpen;
     AntOpenChannelNumber(ANT_CHANNEL_MCHANNEL);
     ANTMChannel_u32Timeout = G_u32SystemTime1ms;
@@ -193,12 +224,14 @@ static void ANTMChannelSM_WaitChannelOpen(void)
   if(AntRadioStatusChannel(ANT_CHANNEL_MCHANNEL) == ANT_OPEN)
   {
     DebugPrintf("Successfully opened master channel.");
+    DebugLineFeed();
     ANTMChannel_pfStateMachine = ANTMChannelSM_Idle;
   }
   
   if(IsTimeUp(&ANTMChannel_u32Timeout, 3000))
   {
     DebugPrintf("Failed to open master channel.");
+    DebugLineFeed();
     ANTMChannel_pfStateMachine = ANTMChannelSM_Error;
   }
 }
