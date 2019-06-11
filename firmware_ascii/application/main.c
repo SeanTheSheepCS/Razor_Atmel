@@ -74,7 +74,7 @@ void main(void)
 
   IrGateInitialize();
   ANTMChannelInitialize();
-  UserApp3Initialize();
+  ANTSChannelInitialize();
 
   
   /* Exit initialization */
@@ -105,7 +105,7 @@ void main(void)
     /* Applications */
     IrGateRunActiveState();
     ANTMChannelRunActiveState();
-    UserApp3RunActiveState();
+    ANTSChannelRunActiveState();
     
     /* System sleep*/
     HEARTBEAT_OFF();

@@ -2240,7 +2240,13 @@
         <group>
             <name>Include</name>
             <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\application\ant_commands.h</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\application\ant_m_channel.h</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\application\ant_s_channel.h</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\application\debug.h</name>
@@ -2254,14 +2260,17 @@
             <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\application\music.h</name>
             </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\firmware_common\application\user_app3.h</name>
-            </file>
         </group>
         <group>
             <name>Source</name>
             <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\application\ant_commands.c</name>
+            </file>
+            <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\application\ant_m_channel.c</name>
+            </file>
+            <file>
+                <name>$PROJ_DIR$\..\..\firmware_common\application\ant_s_channel.c</name>
             </file>
             <file>
                 <name>$PROJ_DIR$\..\..\firmware_common\application\debug.c</name>
@@ -2271,9 +2280,6 @@
             </file>
             <file>
                 <name>$PROJ_DIR$\..\application\main.c</name>
-            </file>
-            <file>
-                <name>$PROJ_DIR$\..\..\firmware_common\application\user_app3.c</name>
             </file>
         </group>
     </group>

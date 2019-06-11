@@ -91,7 +91,8 @@ Includes
 #include "music.h"
 #include "ir_gate_app.h"
 #include "ant_m_channel.h"
-#include "user_app3.h"
+#include "ant_s_channel.h"
+#include "ant_commands.h"
 
 
 /**********************************************************************************************************************

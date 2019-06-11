@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <settings>
     <DebugChecksum>
-        <Checksum>2476070026</Checksum>
+        <Checksum>1478866282</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>
@@ -25,8 +25,8 @@
         <ShowArgs>0</ShowArgs>
     </CallStack>
     <Disassembly>
-        <InstrCount>0</InstrCount>
         <MixedMode>1</MixedMode>
+        <InstrCount>0</InstrCount>
     </Disassembly>
     <JLinkDriver>
         <CStepIntDis>_ 0</CStepIntDis>
