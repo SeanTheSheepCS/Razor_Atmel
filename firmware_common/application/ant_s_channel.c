@@ -29,7 +29,7 @@ All Global variable names shall start with "G_<type>ANTSChannel"
 ***********************************************************************************************************************/
 /* New variables */
 volatile u32 G_u32ANTSChannelFlags;                                                         /*!< @brief Global state flags */
-volatile u8 G_au8ANTSChannelMessageRecieved[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}; /* Message to be sent, to be modified by other applications */
+volatile u8 G_au8ANTSChannelMessageRecieved[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};   /* Message to be sent, to be modified by other applications */
 
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -154,19 +154,21 @@ State Machine Function Definitions
 /* What does this state do? */
 static void ANTSChannelSM_Idle(void)
 {
+  static u8 au8DebugMessage[] = "Slave channel has recieved the message: 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00";
+  for(u8 i = 0; i < 8; i++)
+  {
+    au8DebugMessage[(42 + (6*i))] = HexToASCIICharUpper(G_au8ANTSChannelMessageRecieved[i] / 16);
+    au8DebugMessage[(43 + (6*i))] = HexToASCIICharUpper(G_au8ANTSChannelMessageRecieved[i] % 16);
+  }
   if(AntReadAppMessageBuffer())
   {
-    DebugPrintf("Slave channel has read a message.");
+    DebugPrintf(au8DebugMessage);
     DebugLineFeed();
     if(G_eAntApiCurrentMessageClass == ANT_DATA)
     {
       for(u8 i = 0; i < 8; i++)
       {
         G_au8ANTSChannelMessageRecieved[i] = G_au8AntApiCurrentMessageBytes[i];
-        if(G_au8ANTSChannelMessageRecieved[0] == 0x90)
-        {
-          LedOn(CYAN);
-        }
       }
     }
     else if(G_eAntApiCurrentMessageClass == ANT_TICK)

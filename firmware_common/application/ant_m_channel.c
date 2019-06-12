@@ -29,7 +29,7 @@ All Global variable names shall start with "G_<type>ANTMChannel"
 ***********************************************************************************************************************/
 /* New variables */
 volatile u32 G_u32ANTMChannelFlags;                                                       /*!< @brief Global state flags */
-volatile u8 G_au8ANTMChannelMessageToSend[8] = {0x90,0x40,0x20,0x00,0x00,0x00,0x00,0x00}; /* Message to be sent, to be modified by other applications */
+volatile u8 G_au8ANTMChannelMessageToSend[8] = {0x90,0x40,0x20,0xFF,0xFF,0x00,0x00,0x00}; /* Message to be sent, to be modified by other applications */
 
 
 /*--------------------------------------------------------------------------------------------------------------------*/
@@ -155,13 +155,16 @@ State Machine Function Definitions
 static void ANTMChannelSM_Idle(void)
 {
   static u8 au8Message[8] = {0,0,0,0,0,0,0,0};
+  static u8 au8DebugMessage[] = "Master channel has sent the message: 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00";
   for(u8 i = 0; i < 8; i++)
   {
     au8Message[i] = G_au8ANTMChannelMessageToSend[i];
+    au8DebugMessage[(39 + (6*i))] = HexToASCIICharUpper(G_au8ANTMChannelMessageToSend[i] / 16);
+    au8DebugMessage[(40 + (6*i))] = HexToASCIICharUpper(G_au8ANTMChannelMessageToSend[i] % 16);
   }
   if(AntReadAppMessageBuffer())
   {
-    DebugPrintf("Master channel has read a message.");
+    DebugPrintf(au8DebugMessage);
     DebugLineFeed();
     if(G_eAntApiCurrentMessageClass == ANT_DATA)
     {

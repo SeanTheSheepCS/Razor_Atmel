@@ -40,6 +40,8 @@ extern volatile u32 G_u32SystemTime1s;                    /*!< @brief From main.
 extern volatile u32 G_u32SystemFlags;                     /*!< @brief From main.c */
 extern volatile u32 G_u32ApplicationFlags;                /*!< @brief From main.c */
 
+extern volatile u8 G_au8ANTMChannelMessageToSend[8];      /* From ant_m_channel.c */ 
+extern volatile u8 G_au8ANTSChannelMessageRecieved[8];    /* From ant_s_channel.c */
 
 /***********************************************************************************************************************
 Global variable definitions with scope limited to this local application.
@@ -242,6 +244,22 @@ void CycleTeam()
   LCDMessage(LINE1_START_ADDR, IrGate_au8ReadyMessageWithTeam);
 }
 
+void SetAntMessageToSend(u8* au8MessageToBeSent)
+{
+  for(int i = 0; i < ANT_MESSAGE_LENGTH_BYTES; i++)
+  {
+    G_au8ANTMChannelMessageToSend[i] = au8MessageToBeSent[i];
+  }
+}
+
+void CopyRecievedAntMessageIntoArgument(u8* au8WhereTheAntMessageShouldGo)
+{
+  for(int i = 0; i < ANT_MESSAGE_LENGTH_BYTES; i++)
+  {
+    au8WhereTheAntMessageShouldGo[i] = G_au8ANTSChannelMessageRecieved[i];
+  }
+}
+
 /**********************************************************************************************************************
 State Machine Function Definitions
 **********************************************************************************************************************/
@@ -249,6 +267,8 @@ State Machine Function Definitions
 /* What does this state do? */
 static void IrGateSM_Idle(void)
 {
+  static u8 au8RecievedMessage[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  CopyRecievedAntMessageIntoArgument(&(au8RecievedMessage[0]));
   if(WasButtonPressed(BUTTON0))
   {
     ButtonAcknowledge(BUTTON0);
@@ -261,14 +281,17 @@ static void IrGateSM_Idle(void)
   }
   else if(HasThePinBeenActivated(UPIMO_PIN) && IrGate_gmCurrentMode == GATE_MODE_START)
   {
+    PinActiveAcknowledge(UPIMO_PIN);
     IrGate_pfStateMachine = IrGateSM_TimerActive;
     LCDClearChars(LINE2_START_ADDR, 20);
-    PinActiveAcknowledge(UPIMO_PIN);
+    SetAntMessageToSend(AntCommand_GetBeginTimerAntMessage());
   }
-  //else if( /* GOT AN ANT MESSAGE THAT WAS A START TIMER COMMAND */)
-  //{
-  //  
-  //}
+  else if((AntCommand_MessageToAntCommand(au8RecievedMessage) == ANT_COMMAND_BEGIN_TIMER) && (IrGate_gmCurrentMode != GATE_MODE_START))
+  {
+    IrGate_pfStateMachine = IrGateSM_TimerActive;
+    LCDClearChars(LINE2_START_ADDR, 20);
+    SetAntMessageToSend(AntCommand_GetBeginTimerAntMessage());
+  }
 } /* end IRStartGateSM_Idle() */
      
 static void IrGateSM_TimerActive(void)
@@ -299,11 +322,6 @@ static void IrGateSM_TimerActive(void)
     IrGate_pfStateMachine = IrGateSM_Idle;
   } 
 } /* end IrGateSM_TimerActive() */
-
-static void IrGateSM_ReplyRecieved(void)
-{
-  
-}
 
 
 /*-------------------------------------------------------------------------------------------------------------------*/

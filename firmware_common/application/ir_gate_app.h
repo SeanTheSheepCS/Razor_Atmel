@@ -37,13 +37,14 @@ void IrGateDisplayTimer(void);
 /*--------------------------------------------------------------------------------------------------------------------*/
 void CycleMode(void);
 void CycleTeam(void);
+void SetAntMessageToSend(u8* au8MessageToBeSent);
+void CopyRecievedAntMessageIntoArgument(u8* au8WhereTheAntMessageShouldGo);
 
 /***********************************************************************************************************************
 State Machine Declarations
 ***********************************************************************************************************************/
 static void IrGateSM_Idle(void);
 static void IrGateSM_TimerActive(void);
-static void IrGateSM_ReplyRecieved(void);
 static void IrGateSM_Error(void);         
 
 

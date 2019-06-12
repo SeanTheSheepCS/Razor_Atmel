@@ -38,12 +38,12 @@ Function Definitions
 /*! @protectedsection */                                                                                            
 /*--------------------------------------------------------------------------------------------------------------------*/
 
-u8 AntCommand_MessageToAntCommand(u8 au8Message[])
+AntCommandType AntCommand_MessageToAntCommand(u8 au8Message[])
 {
   static u8 au8BeginMessage[] = ANT_MESSAGE_BEGIN_TIMER;
   static u8 au8EndMessage[] = ANT_MESSAGE_END_TIMER;
-  static bool isBeginMessage = TRUE;
-  static bool isEndMessage = TRUE;
+  bool isBeginMessage = TRUE;
+  bool isEndMessage = TRUE;
   for(u8 i = 0; i < ANT_MESSAGE_LENGTH_BYTES; i++)
   {
     if(au8Message[i] != au8BeginMessage[i])

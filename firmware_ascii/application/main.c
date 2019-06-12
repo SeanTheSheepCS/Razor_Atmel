@@ -106,8 +106,16 @@ void main(void)
     IrGateRunActiveState();
     
     /* ANT message */
-    ANTSChannelRunActiveState();
-    ANTMChannelRunActiveState();
+    if(G_u32SystemTime1ms % 3 == 0 || G_u32SystemTime1ms % 3 == 1)
+    {
+      ANTSChannelRunActiveState();
+      ANTMChannelRunActiveState();
+    }
+    else if(G_u32SystemTime1ms % 3 == 2)
+    {
+      ANTMChannelRunActiveState();
+      ANTSChannelRunActiveState();
+    }
     
     /* System sleep*/
     HEARTBEAT_OFF();
