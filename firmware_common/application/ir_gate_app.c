@@ -48,7 +48,7 @@ Global variable definitions with scope limited to this local application.
 Variable names shall start with "IrGate_<type>" and be declared as static.
 ***********************************************************************************************************************/
 static fnCode_type IrGate_pfStateMachine;               /*!< @brief The state machine function pointer */
-//static u32 IrGate_u32Timeout;                           /*!< @brief Timeout counter used across states */
+static u32 IrGate_u32Timeout;                           /*!< @brief Timeout counter used across states */
 static u8* IrGate_au8ReadyMessageWithTeam = "Ready For RED Team!";
 static Team IrGate_tTeam = RED_TEAM;
 static u8 IrGate_au8TimeDisplay[] = "Time: 00:00.000";
@@ -296,20 +296,14 @@ static void IrGateSM_Idle(void)
      
 static void IrGateSM_TimerActive(void)
 {
+  static u8 au8RecievedMessage[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  CopyRecievedAntMessageIntoArgument(&(au8RecievedMessage[0]));
   IrGateIncrementTimer();
   if(G_u32SystemTime1ms % 19 == 0)
   {
     IrGateDisplayTimer();
   }
   
-  if(IsPinActive(UPIMO_PIN))
-  {
-    LedOn(GREEN);
-  }
-  else
-  {
-    LedOff(GREEN);
-  }
   if(WasButtonPressed(BUTTON0))
   {
     ButtonAcknowledge(BUTTON0);
@@ -320,9 +314,44 @@ static void IrGateSM_TimerActive(void)
     IrGateResetTimer();
     LedOff(GREEN);
     IrGate_pfStateMachine = IrGateSM_Idle;
-  } 
+  }
+  if((AntCommand_MessageToAntCommand(au8RecievedMessage) == ANT_COMMAND_END_TIMER))
+  {
+    IrGate_pfStateMachine = IrGateSM_TimerFrozen;
+    SetAntMessageToSend(AntCommand_GetEndTimerAntMessage());
+    IrGate_u32Timeout = G_u32SystemTime1ms;
+  }
+  if(HasThePinBeenActivated(UPIMO_PIN) && IrGate_gmCurrentMode == GATE_MODE_INTERMEDIATE)
+  {
+    PinActiveAcknowledge(UPIMO_PIN);
+    IrGate_pfStateMachine = IrGateSM_TimerFrozen;
+    SetAntMessageToSend(AntCommand_GetIdleAntMessage());
+    IrGate_u32Timeout = G_u32SystemTime1ms;
+  }
+  if(HasThePinBeenActivated(UPIMO_PIN) && IrGate_gmCurrentMode == GATE_MODE_FINISH)
+  {
+    PinActiveAcknowledge(UPIMO_PIN);
+    IrGate_pfStateMachine = IrGateSM_TimerFrozen;
+    SetAntMessageToSend(AntCommand_GetEndTimerAntMessage());
+    IrGate_u32Timeout = G_u32SystemTime1ms;
+  }
 } /* end IrGateSM_TimerActive() */
 
+static void IrGateSM_TimerFrozen(void)
+{
+  //Wait with the timer frozen for a specific amount of time to make sure that start timer signals do not accidentally trigger the timer to start again
+  if(IsTimeUp(&IrGate_u32Timeout, MINIMUM_TIME_BETWEEN_ENDING_TIMER_AND_STARTING_AGAIN_MS))
+  {
+    DebugPrintf("Ready to begin again!");
+    DebugLineFeed();
+    IrGate_pfStateMachine = IrGateSM_ReadyForNextTimerReset;
+  }
+}
+
+static void IrGateSM_ReadyForNextTimerReset(void)
+{
+  
+}
 
 /*-------------------------------------------------------------------------------------------------------------------*/
 /* Handle an error */

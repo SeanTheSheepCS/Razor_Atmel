@@ -45,6 +45,8 @@ State Machine Declarations
 ***********************************************************************************************************************/
 static void IrGateSM_Idle(void);
 static void IrGateSM_TimerActive(void);
+static void IrGateSM_TimerFrozen(void);
+static void IrGateSM_ReadyForNextTimerReset(void);
 static void IrGateSM_Error(void);         
 
 
@@ -53,6 +55,7 @@ static void IrGateSM_Error(void);
 Constants / Definitions
 **********************************************************************************************************************/
 
+#define MINIMUM_TIME_BETWEEN_ENDING_TIMER_AND_STARTING_AGAIN_MS (u32)10000
 
 #endif /* __IRGATEAPP_H */
 /*--------------------------------------------------------------------------------------------------------------------*/

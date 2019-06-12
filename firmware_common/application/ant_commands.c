@@ -78,6 +78,12 @@ u8* AntCommand_GetEndTimerAntMessage()
   return &(u8pAddressOfEndTimerMessage[0]);
 }
 
+u8* AntCommand_GetIdleAntMessage()
+{
+  static u8 u8pAddressOfIdleMessage[] = ANT_MESSAGE_IDLE;
+  return &(u8pAddressOfIdleMessage[0]);
+}
+
 
 /*------------------------------------------------------------------------------------------------------------------*/
 /*! @privatesection */                                                                                            
