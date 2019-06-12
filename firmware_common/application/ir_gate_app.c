@@ -312,7 +312,6 @@ static void IrGateSM_TimerActive(void)
     LCDClearChars(LINE2_START_ADDR, 20);
     LCDMessage(LINE2_START_ADDR, IrGate_au8ModeDisplay);
     IrGateResetTimer();
-    LedOff(GREEN);
     IrGate_pfStateMachine = IrGateSM_Idle;
   }
   if((AntCommand_MessageToAntCommand(au8RecievedMessage) == ANT_COMMAND_END_TIMER))
@@ -344,13 +343,33 @@ static void IrGateSM_TimerFrozen(void)
   {
     DebugPrintf("Ready to begin again!");
     DebugLineFeed();
+    SetAntMessageToSend(AntCommand_GetIdleAntMessage());
     IrGate_pfStateMachine = IrGateSM_ReadyForNextTimerReset;
   }
 }
 
 static void IrGateSM_ReadyForNextTimerReset(void)
 {
+  static u8 au8RecievedMessage[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+  CopyRecievedAntMessageIntoArgument(&(au8RecievedMessage[0]));
   
+  if(WasButtonPressed(BUTTON0))
+  {
+    ButtonAcknowledge(BUTTON0);
+    LCDClearChars(LINE1_START_ADDR, 20);
+    LCDMessage(LINE1_START_ADDR, IrGate_au8ReadyMessageWithTeam);
+    LCDClearChars(LINE2_START_ADDR, 20);
+    LCDMessage(LINE2_START_ADDR, IrGate_au8ModeDisplay);
+    IrGateResetTimer();
+    IrGate_pfStateMachine = IrGateSM_Idle;
+  }
+  
+  if((AntCommand_MessageToAntCommand(au8RecievedMessage) == ANT_COMMAND_BEGIN_TIMER))
+  {
+    IrGateResetTimer();
+    LCDClearChars(LINE1_START_ADDR, 20);
+    IrGate_pfStateMachine = IrGateSM_TimerActive;
+  }
 }
 
 /*-------------------------------------------------------------------------------------------------------------------*/
