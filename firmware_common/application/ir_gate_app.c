@@ -262,6 +262,7 @@ static void IrGateSM_Idle(void)
   else if(HasThePinBeenActivated(UPIMO_PIN) && IrGate_gmCurrentMode == GATE_MODE_START)
   {
     IrGate_pfStateMachine = IrGateSM_TimerActive;
+    LCDClearChars(LINE2_START_ADDR, 20);
     PinActiveAcknowledge(UPIMO_PIN);
   }
   //else if( /* GOT AN ANT MESSAGE THAT WAS A START TIMER COMMAND */)
@@ -286,10 +287,13 @@ static void IrGateSM_TimerActive(void)
   {
     LedOff(GREEN);
   }
-  if(IsButtonPressed(BUTTON0))
+  if(WasButtonPressed(BUTTON0))
   {
+    ButtonAcknowledge(BUTTON0);
     LCDClearChars(LINE1_START_ADDR, 20);
     LCDMessage(LINE1_START_ADDR, IrGate_au8ReadyMessageWithTeam);
+    LCDClearChars(LINE2_START_ADDR, 20);
+    LCDMessage(LINE2_START_ADDR, IrGate_au8ModeDisplay);
     IrGateResetTimer();
     LedOff(GREEN);
     IrGate_pfStateMachine = IrGateSM_Idle;
